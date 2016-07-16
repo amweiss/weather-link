@@ -1,40 +1,36 @@
-﻿using System;
+﻿using Humanizer;
+using Microsoft.Extensions.Options;
+using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Humanizer;
-using Microsoft.Extensions.Options;
 using WeatherLink.ExtensionMethods;
 using WeatherLink.Models;
 
-namespace WeatherLink.Services
-{
-    internal class WeatherBasedTrafficAdviceService : ITrafficAdviceService
-    {
+namespace WeatherLink.Services {
+
+    internal class WeatherBasedTrafficAdviceService : ITrafficAdviceService {
         private readonly IOptions<WeatherLinkSettings> _optionsAccessor;
         private readonly IForecastService _forecastService;
-        public WeatherBasedTrafficAdviceService(IOptions<WeatherLinkSettings> optionsAccessor, IForecastService forecastRepository)
-        {
+
+        public WeatherBasedTrafficAdviceService(IOptions<WeatherLinkSettings> optionsAccessor, IForecastService forecastRepository) {
             _optionsAccessor = optionsAccessor;
             _forecastService = forecastRepository;
         }
 
-        public async Task<string> GetTrafficAdviceForATime(double latitude, double longitude, double hoursFromNow)
-        {
+        public async Task<string> GetTrafficAdviceForATime(double latitude, double longitude, double hoursFromNow, int travelTime) {
             var forecast = await _forecastService.GetForecast(latitude, longitude);
             var currently = forecast.Currently;
 
             if (forecast?.HourlyData == null) return "No data found";
 
             var forecasts = forecast.MinutelyData?.ToList();
-            if (forecasts != null)
-            {
+            if (forecasts != null) {
                 forecasts.AddRange(
                     forecast?.HourlyData.Where(
                         x => !forecasts.Any() || (x.time > forecasts.Last().time && x.time > currently.time)));
             }
-            else
-            {
+            else {
                 forecasts = forecast.HourlyData.ToList();
             }
 
@@ -43,17 +39,14 @@ namespace WeatherLink.Services
             var now = homeDateTimeOffset.UtcDateTime;
             var targetTime = now.AddHours(hoursFromNow);
 
-            if (targetTime - homeDateTimeOffset <= TimeSpan.FromHours(1))
-            {
-                bestTimeToLeave = forecasts.Any() ? forecasts.MinimumPrecipitation(20)?.FirstOrDefault() : null;
+            if (targetTime - homeDateTimeOffset <= TimeSpan.FromHours(1)) {
+                bestTimeToLeave = forecasts.Any() ? forecasts.MinimumPrecipitation(travelTime)?.FirstOrDefault() : null;
             }
-            else
-            {
+            else {
                 var targetUnixSeconds = new DateTimeOffset(targetTime).ToUnixTimeSeconds();
                 var afterTarget = 0;
 
-                while (afterTarget < forecasts.Count && forecasts[afterTarget].time < targetUnixSeconds)
-                {
+                while (afterTarget < forecasts.Count && forecasts[afterTarget].time < targetUnixSeconds) {
                     afterTarget++;
                 }
 
@@ -70,19 +63,17 @@ namespace WeatherLink.Services
             return bestTimeToLeave == null ? "No result found" : $"The best time to leave about {targetTime.Humanize(dateToCompareAgainst: now)} is {DateTimeOffset.FromUnixTimeSeconds(bestTimeToLeave.time).Humanize(homeDateTimeOffset)}.";
         }
 
-        public async Task<string> GetTrafficAdvice(double latitude, double longitude)
+        public async Task<string> GetTrafficAdvice(double latitude, double longitude, int travelTime)
         //TODO: I hate this, fix it
         {
-            try
-            {
+            try {
                 var forecast = await _forecastService.GetForecast(latitude, longitude);
                 var currently = forecast.Currently;
                 var forecasts = forecast.MinutelyData?.ToList();
 
                 if (currently == null || forecasts == null) return "No data found";
 
-                var bestTimeToLeaveWork = forecasts.Any() ? forecasts.MinimumPrecipitation(20)?.FirstOrDefault() : null;
-                //TODO: make this dynamic
+                var bestTimeToLeaveWork = forecasts.Any() ? forecasts.MinimumPrecipitation(travelTime)?.FirstOrDefault() : null;
 
                 forecasts.AddRange(
                     forecast.HourlyData.Where(
@@ -101,8 +92,7 @@ namespace WeatherLink.Services
                 var sb = new StringBuilder();
                 var homeDateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(currently.time);
 
-                if (currently.precipIntensity > 0)
-                {
+                if (currently.precipIntensity > 0) {
                     var minimumPrecipitation =
                         forecasts.FirstOrDefault(
                             x =>
@@ -134,8 +124,7 @@ namespace WeatherLink.Services
                         sb.AppendLine(
                             $"{(nextHeavyPrecipitation.precipType ?? currently.precipType).Transform(To.SentenceCase)} getting much worse {DateTimeOffset.FromUnixTimeSeconds(nextHeavyPrecipitation.time).Humanize(homeDateTimeOffset)}.");
                 }
-                else
-                {
+                else {
                     var nextPrecipitation =
                         forecasts.FirstOrDefault(
                             x => x.precipIntensity > Weather.MeasurableThreshold && x.time >= currently.time);
@@ -152,8 +141,7 @@ namespace WeatherLink.Services
 
                 return sb.Length != 0 ? sb.ToString() : "Clear skies for as far I can see!";
             }
-            catch (Exception)
-            {
+            catch (Exception) {
                 return null;
             }
         }

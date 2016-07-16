@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 
-namespace WeatherLink.Models
-{
+namespace WeatherLink.Models {
+
     /// <summary>
     /// Container for the application settings.
     /// </summary>
-    public sealed class WeatherLinkSettings
-    {
+    public sealed class WeatherLinkSettings {
+
         /// <summary>
         /// The API key for use with the DarkSky API.
         /// </summary>

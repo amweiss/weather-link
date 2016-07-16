@@ -1,10 +1,10 @@
-namespace WeatherLink.Models
-{
+namespace WeatherLink.Models {
+
     /// <summary>
     /// Weather conditions at a point in time.
     /// </summary>
-    public class Weather
-    {
+    public class Weather {
+
         /// <summary>
         /// The threshold where percipitation is deemed measurable.
         /// </summary>

@@ -1,13 +1,13 @@
 ﻿using System.Threading.Tasks;
 using WeatherLink.Models;
 
-namespace WeatherLink.Services
-{
+namespace WeatherLink.Services {
+
     /// <summary>
     /// A service to get a weather forecast.
     /// </summary>
-    public interface IForecastService
-    {
+    public interface IForecastService {
+
         /// <summary>
         /// Get the current forecast at a given latitude and longitude.
         /// </summary>

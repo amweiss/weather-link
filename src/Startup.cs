@@ -1,20 +1,19 @@
-using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
+using Swashbuckle.Swagger.Model;
+using System.IO;
 using WeatherLink.Models;
 using WeatherLink.Services;
-using Swashbuckle.Swagger.Model;
 
-namespace WeatherLink
-{
-    internal class Startup
-    {
-        public Startup(IHostingEnvironment env)
-        {
+namespace WeatherLink {
+
+    internal class Startup {
+
+        public Startup(IHostingEnvironment env) {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
@@ -26,8 +25,7 @@ namespace WeatherLink
         public IConfigurationRoot Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
+        public void ConfigureServices(IServiceCollection services) {
             // Add framework services
             services.AddMvc();
             services.AddOptions();
@@ -37,13 +35,12 @@ namespace WeatherLink
             services.AddTransient<IForecastService, DarkSkyForecastService>();
             services.AddTransient<ITrafficAdviceService, WeatherBasedTrafficAdviceService>();
             services.AddTransient<IGeocodeService, GoogleMapsGeocodeService>();
+            services.AddTransient<IDistanceToDurationService, GoogleMapsDistanceToDurationService>();
 
             // Configure swagger
             services.AddSwaggerGen();
-            services.ConfigureSwaggerGen(options =>
-            {
-                options.SingleApiVersion(new Info
-                {
+            services.ConfigureSwaggerGen(options => {
+                options.SingleApiVersion(new Info {
                     Version = "v1",
                     Title = "Weather Link",
                     Description = "An API to get weather based advice.",
@@ -55,8 +52,7 @@ namespace WeatherLink
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
-        {
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory) {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
@@ -68,8 +64,7 @@ namespace WeatherLink
             app.UseSwaggerUi();
         }
 
-        private string GetXmlCommentsPath()
-        {
+        private string GetXmlCommentsPath() {
             var app = PlatformServices.Default.Application;
             return Path.Combine(app.ApplicationBasePath, Path.ChangeExtension(app.ApplicationName, "xml"));
         }
