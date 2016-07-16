@@ -4,7 +4,7 @@ using WeatherLink.Models;
 
 namespace WeatherLink.ExtensionMethods {
 
-    internal static class ListOfWeatherExtensions {
+    static class ListOfWeatherExtensions {
 
         internal static IEnumerable<Weather> MinimumPrecipitation(this List<Weather> forecasts, int numberOfMinutes) {
             var currentSum = forecasts.Take(numberOfMinutes).Sum(x => x.precipIntensity);

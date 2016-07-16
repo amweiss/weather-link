@@ -13,7 +13,7 @@ namespace WeatherLink.Services
     /// </summary>
     public class GoogleMapsDistanceToDurationService : IDistanceToDurationService
     {
-        private IOptions<WeatherLinkSettings> _optionsAccessor;
+        readonly IOptions<WeatherLinkSettings> _optionsAccessor;
 
         /// <summary>
         /// Create a new Google Maps Distance to Duration service based on optionsAccessor.

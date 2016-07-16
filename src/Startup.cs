@@ -11,7 +11,7 @@ using WeatherLink.Services;
 
 namespace WeatherLink {
 
-    internal class Startup {
+    class Startup {
 
         public Startup(IHostingEnvironment env) {
             var builder = new ConfigurationBuilder()
@@ -52,7 +52,7 @@ namespace WeatherLink {
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory) {
+        public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory) {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
@@ -64,7 +64,7 @@ namespace WeatherLink {
             app.UseSwaggerUi();
         }
 
-        private string GetXmlCommentsPath() {
+        string GetXmlCommentsPath() {
             var app = PlatformServices.Default.Application;
             return Path.Combine(app.ApplicationBasePath, Path.ChangeExtension(app.ApplicationName, "xml"));
         }

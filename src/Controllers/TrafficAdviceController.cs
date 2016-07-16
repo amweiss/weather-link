@@ -15,10 +15,10 @@ namespace WeatherLink.Controllers {
     /// </summary>
     [Route("trafficadvice")]
     public class TrafficAdviceController : Controller {
-        private readonly IOptions<WeatherLinkSettings> _optionsAccessor;
-        private readonly ITrafficAdviceService _trafficAdviceService;
-        private readonly IGeocodeService _geocodeService;
-        private readonly IDistanceToDurationService _distanceToDurationService;
+        readonly IOptions<WeatherLinkSettings> _optionsAccessor;
+        readonly ITrafficAdviceService _trafficAdviceService;
+        readonly IGeocodeService _geocodeService;
+        readonly IDistanceToDurationService _distanceToDurationService;
 
         /// <summary>
         /// Access traffic advice via a web API.
@@ -113,13 +113,17 @@ namespace WeatherLink.Controllers {
         [Route("from/{startingLocation}/to/{endingLocation}")]
         [HttpGet]
         public async Task<string> GetTrafficAdviceToALocation(string startingLocation, string endingLocation) {
-            var duration = await _distanceToDurationService.TimeInMinutesBetweenLocations(startingLocation, endingLocation);
+            var durationTask = _distanceToDurationService.TimeInMinutesBetweenLocations(startingLocation, endingLocation);
+            var targetTask = _geocodeService.Geocode(startingLocation);
+
+            var target = await targetTask;
+            var duration = await durationTask;
+
             if (duration == null) {
                 Response.StatusCode = (int)HttpStatusCode.NoContent;
                 return null;
             }
 
-            var target = await _geocodeService.Geocode(startingLocation);
             if (target == null) {
                 Response.StatusCode = (int)HttpStatusCode.NoContent;
                 return null;
@@ -147,19 +151,23 @@ namespace WeatherLink.Controllers {
         [Route("fortime/{time}/from/{startingLocation}/to/{endingLocation}")]
         [HttpGet]
         public async Task<string> GetTrafficAdviceToALocationForATime(string startingLocation, string endingLocation, double time) {
-            var duration = await _distanceToDurationService.TimeInMinutesBetweenLocations(startingLocation, endingLocation);
-            if (duration == null) {
+            var durationTask = _distanceToDurationService.TimeInMinutesBetweenLocations(startingLocation, endingLocation);
+            var targetTask = _geocodeService.Geocode(startingLocation);
+
+            var targetResult = await targetTask;
+            var durationResult = await durationTask;
+
+            if (durationResult == null) {
                 Response.StatusCode = (int)HttpStatusCode.NoContent;
                 return null;
             }
 
-            var target = await _geocodeService.Geocode(startingLocation);
-            if (target == null) {
+            if (targetResult == null) {
                 Response.StatusCode = (int)HttpStatusCode.NoContent;
                 return null;
             }
 
-            var result = await _trafficAdviceService.GetTrafficAdviceForATime(target.Item1, target.Item2, time, duration.Value);
+            var result = await _trafficAdviceService.GetTrafficAdviceForATime(targetResult.Item1, targetResult.Item2, time, durationResult.Value);
             if (result == null) {
                 Response.StatusCode = (int)HttpStatusCode.NoContent;
                 return null;
@@ -167,7 +175,7 @@ namespace WeatherLink.Controllers {
 
             var retVal = new StringBuilder();
             retVal.AppendLine(result);
-            retVal.AppendLine(GetForecastIoByLine(target.Item1, target.Item2));
+            retVal.AppendLine(GetForecastIoByLine(targetResult.Item1, targetResult.Item2));
             return retVal.ToString();
         }
 

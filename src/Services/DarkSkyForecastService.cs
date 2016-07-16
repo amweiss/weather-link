@@ -10,14 +10,14 @@ using WeatherLink.Models;
 
 namespace WeatherLink.Services {
 
-    internal class DarkSkyForecastService : IForecastService {
-        private readonly IOptions<WeatherLinkSettings> _optionsAccessor;
+    class DarkSkyForecastService : IForecastService {
+        readonly IOptions<WeatherLinkSettings> _optionsAccessor;
 
         public DarkSkyForecastService(IOptions<WeatherLinkSettings> optionsAccessor) {
             _optionsAccessor = optionsAccessor;
         }
 
-        private async Task<JObject> GetAsJObject(double latitude, double longitude) {
+        async Task<JObject> GetAsJObject(double latitude, double longitude) {
             using (var client = new HttpClient()) {
                 client.BaseAddress = new Uri(_optionsAccessor.Value.DarkSkyApiBase);
                 var response = await client.GetAsync($"forecast/{_optionsAccessor.Value.DarkSkyApiKey}/{latitude:N4},{longitude:N4}?exclude=daily,alerts");

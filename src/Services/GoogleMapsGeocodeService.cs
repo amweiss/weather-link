@@ -12,7 +12,7 @@ namespace WeatherLink.Services {
     /// Provides a geocoding service based on the Google Maps API.
     /// </summary>
     public class GoogleMapsGeocodeService : IGeocodeService {
-        private IOptions<WeatherLinkSettings> _optionsAccessor;
+        readonly IOptions<WeatherLinkSettings> _optionsAccessor;
 
         /// <summary>
         /// Create a new Google Maps Geocode service based on optionsAccessor.

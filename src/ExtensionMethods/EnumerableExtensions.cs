@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace WeatherLink.ExtensionMethods {
 
-    internal static class EnumerableExtensions {
+    static class EnumerableExtensions {
 
         //from: https://github.com/morelinq/MoreLINQ/blob/master/MoreLinq/MinBy.cs
         public static TSource MinBy<TSource, TKey>(this IEnumerable<TSource> source,
@@ -13,8 +13,8 @@ namespace WeatherLink.ExtensionMethods {
 
         public static TSource MinBy<TSource, TKey>(this IEnumerable<TSource> source,
                                                                         Func<TSource, TKey> selector, IComparer<TKey> comparer) {
-            if (source == null) throw new ArgumentNullException("source");
-            if (selector == null) throw new ArgumentNullException("selector");
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (selector == null) throw new ArgumentNullException(nameof(selector));
             comparer = comparer ?? Comparer<TKey>.Default;
             using (var sourceIterator = source.GetEnumerator()) {
                 if (!sourceIterator.MoveNext()) {
