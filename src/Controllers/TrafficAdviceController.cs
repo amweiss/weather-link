@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Options;
 using System;
 using System.Net;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WeatherLink.Models;
@@ -38,17 +37,14 @@ namespace WeatherLink.Controllers {
         /// <returns>A string value describing when to leave based on the weather.</returns>
         [Route("{latitude}/{longitude}")]
         [HttpGet]
-        public async Task<string> GetTrafficAdvice(double latitude, double longitude) {
+        public async Task<WeatherBasedTrafficAdvice> GetTrafficAdvice(double latitude, double longitude) {
             var result = await _trafficAdviceService.GetTrafficAdvice(latitude, longitude);
             if (result == null) {
                 Response.StatusCode = (int)HttpStatusCode.NoContent;
                 return null;
             }
 
-            var retVal = new StringBuilder();
-            retVal.AppendLine(result);
-            retVal.AppendLine(GetForecastIoByLine(latitude, longitude));
-            return retVal.ToString();
+            return result;
         }
 
         /// <summary>
@@ -58,7 +54,7 @@ namespace WeatherLink.Controllers {
         /// <returns>A string value describing when to leave based on the weather.</returns>
         [Route("{location}")]
         [HttpGet]
-        public async Task<string> GetTrafficAdvice(string location) {
+        public async Task<WeatherBasedTrafficAdvice> GetTrafficAdvice(string location) {
             var target = await _geocodeService.Geocode(location);
             if (target == null) {
                 Response.StatusCode = (int)HttpStatusCode.NoContent;
@@ -71,10 +67,7 @@ namespace WeatherLink.Controllers {
                 return null;
             }
 
-            var retVal = new StringBuilder();
-            retVal.AppendLine(result);
-            retVal.AppendLine(GetForecastIoByLine(target.Item1, target.Item2));
-            return retVal.ToString();
+            return result;
         }
 
         /// <summary>
@@ -85,7 +78,7 @@ namespace WeatherLink.Controllers {
         /// <returns>A string value describing when to leave based on the weather.</returns>
         [Route("fortime/{time}/{location}")]
         [HttpGet]
-        public async Task<string> GetTrafficAdviceForATime(string location, double time) {
+        public async Task<WeatherBasedTrafficAdvice> GetTrafficAdviceForATime(string location, double time) {
             var target = await _geocodeService.Geocode(location);
             if (target == null) {
                 Response.StatusCode = (int)HttpStatusCode.NoContent;
@@ -98,10 +91,7 @@ namespace WeatherLink.Controllers {
                 return null;
             }
 
-            var retVal = new StringBuilder();
-            retVal.AppendLine(result);
-            retVal.AppendLine(GetForecastIoByLine(target.Item1, target.Item2));
-            return retVal.ToString();
+            return result;
         }
 
         /// <summary>
@@ -112,7 +102,7 @@ namespace WeatherLink.Controllers {
         /// <returns>A string value describing when to leave based on the weather.</returns>
         [Route("from/{startingLocation}/to/{endingLocation}")]
         [HttpGet]
-        public async Task<string> GetTrafficAdviceToALocation(string startingLocation, string endingLocation) {
+        public async Task<WeatherBasedTrafficAdvice> GetTrafficAdviceToALocation(string startingLocation, string endingLocation) {
             var durationTask = _distanceToDurationService.TimeInMinutesBetweenLocations(startingLocation, endingLocation);
             var targetTask = _geocodeService.Geocode(startingLocation);
 
@@ -135,10 +125,7 @@ namespace WeatherLink.Controllers {
                 return null;
             }
 
-            var retVal = new StringBuilder();
-            retVal.AppendLine(result);
-            retVal.AppendLine(GetForecastIoByLine(target.Item1, target.Item2));
-            return retVal.ToString();
+            return result;
         }
 
         /// <summary>
@@ -150,7 +137,7 @@ namespace WeatherLink.Controllers {
         /// <returns>A string value describing when to leave based on the weather.</returns>
         [Route("fortime/{time}/from/{startingLocation}/to/{endingLocation}")]
         [HttpGet]
-        public async Task<string> GetTrafficAdviceToALocationForATime(string startingLocation, string endingLocation, double time) {
+        public async Task<WeatherBasedTrafficAdvice> GetTrafficAdviceToALocationForATime(string startingLocation, string endingLocation, double time) {
             var durationTask = _distanceToDurationService.TimeInMinutesBetweenLocations(startingLocation, endingLocation);
             var targetTask = _geocodeService.Geocode(startingLocation);
 
@@ -173,10 +160,7 @@ namespace WeatherLink.Controllers {
                 return null;
             }
 
-            var retVal = new StringBuilder();
-            retVal.AppendLine(result);
-            retVal.AppendLine(GetForecastIoByLine(targetResult.Item1, targetResult.Item2));
-            return retVal.ToString();
+            return result;
         }
 
         /// <summary>
@@ -195,43 +179,44 @@ namespace WeatherLink.Controllers {
 
             var checkCommand = Regex.Match(text, @"^(?:in (\d*[.,]?\d*) hours? from )?(.+?)(?: for (.+))?$");
 
-            var retVal = (string)null;
+            var advice = (WeatherBasedTrafficAdvice)null;
 
             if (checkCommand.Success) {
                 var hours = checkCommand.Groups?[1]?.Value;
                 var startingLocation = checkCommand.Groups?[2]?.Value;
                 var endingLocation = checkCommand.Groups?[3]?.Value;
 
-                var hoursFromNow = Convert.ToDouble(hours);
+                double hoursFromNow;
+                var hasHours = double.TryParse(hours, out hoursFromNow);
 
-                if (hoursFromNow < 0 || startingLocation == null) {
+                if ((hasHours && hoursFromNow < 0) || startingLocation == null) {
                     Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     return null;
                 }
 
                 // TODO: Find better way?
-                if (endingLocation == null && hours != null) {
-                    retVal = await GetTrafficAdviceForATime(startingLocation, hoursFromNow);
+                if (string.IsNullOrWhiteSpace(endingLocation) && hasHours) {
+                    advice = await GetTrafficAdviceForATime(startingLocation, hoursFromNow);
                 }
-                else if (endingLocation != null && hours == null) {
-                    retVal = await GetTrafficAdviceToALocation(startingLocation, endingLocation);
+                else if (!string.IsNullOrWhiteSpace(endingLocation) && !hasHours) {
+                    advice = await GetTrafficAdviceToALocation(startingLocation, endingLocation);
                 }
-                else if (endingLocation != null && hours != null) {
-                    retVal = await GetTrafficAdviceToALocationForATime(startingLocation, endingLocation, hoursFromNow);
+                else if (!string.IsNullOrWhiteSpace(endingLocation) && hasHours) {
+                    advice = await GetTrafficAdviceToALocationForATime(startingLocation, endingLocation, hoursFromNow);
                 }
                 else {
-                    retVal = await GetTrafficAdvice(startingLocation);
+                    advice = await GetTrafficAdvice(startingLocation);
                 }
             }
 
-            if (retVal == null) {
+            if (advice == null) {
                 Response.StatusCode = (int)HttpStatusCode.NoContent;
                 return null;
             }
 
-            return new SlackResponse { response_type = "in_channel", text = Regex.Replace(retVal, @"\r\n?|\n", "\n") };
-        }
+            var message = advice + Environment.NewLine + $"<{advice.DataSource}|{advice.AttributionLine}>";
 
-        private static string GetForecastIoByLine(double latitude, double longitude) => $"<http://forecast.io/#/f/{latitude:N4},{longitude:N4}|Powered by Forecast>";
+            return new SlackResponse { response_type = "in_channel", text = Regex.Replace(message, @"\r\n?|\n", "\n") };
+        }
     }
 }

@@ -18,31 +18,30 @@ namespace WeatherLink.Services {
             _forecastService = forecastRepository;
         }
 
-        public async Task<string> GetTrafficAdviceForATime(double latitude, double longitude, double hoursFromNow, int travelTime) {
+        public async Task<WeatherBasedTrafficAdvice> GetTrafficAdviceForATime(double latitude, double longitude, double hoursFromNow, int travelTime) {
             var forecast = await _forecastService.GetForecast(latitude, longitude);
-            var currently = forecast.Currently;
+            if (forecast?.HourlyData == null) return null;
 
-            if (forecast?.HourlyData == null) return "No data found";
+            var retVal = new WeatherBasedTrafficAdvice { Currently = forecast.Currently };
 
             var forecasts = forecast.MinutelyData?.ToList();
             if (forecasts != null) {
                 forecasts.AddRange(
-                    forecast?.HourlyData.Where(x => !forecasts.Any() || (x.time > forecasts.Last().time && x.time > currently.time)));
+                    forecast?.HourlyData.Where(x => !forecasts.Any() || (x.time > forecasts.Last().time && x.time > retVal.Currently.time)));
             }
             else {
                 forecasts = forecast.HourlyData.ToList();
             }
 
-            var bestTimeToLeave = (Weather)null;
-            var homeDateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(currently.time);
+            var homeDateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(retVal.Currently.time);
             var now = homeDateTimeOffset.UtcDateTime;
-            var targetTime = now.AddHours(hoursFromNow);
+            retVal.TargetTime = now.AddHours(hoursFromNow);
 
-            if (targetTime - homeDateTimeOffset <= TimeSpan.FromHours(1)) {
-                bestTimeToLeave = forecasts.Any() ? forecasts.MinimumPrecipitation(travelTime)?.FirstOrDefault() : null;
+            if (retVal.TargetTime - homeDateTimeOffset <= TimeSpan.FromHours(1)) {
+                retVal.BestTimeToLeave = forecasts.Any() ? forecasts.MinimumPrecipitation(travelTime)?.FirstOrDefault() : null;
             }
             else {
-                var targetUnixSeconds = new DateTimeOffset(targetTime).ToUnixTimeSeconds();
+                var targetUnixSeconds = new DateTimeOffset(retVal.TargetTime.Value).ToUnixTimeSeconds();
                 var afterTarget = 0;
 
                 while (afterTarget < forecasts.Count && forecasts[afterTarget].time < targetUnixSeconds) {
@@ -51,87 +50,54 @@ namespace WeatherLink.Services {
 
                 var range = forecasts.Skip(afterTarget - 2)
                     .Take(5)
-                    .Where(x => Math.Abs((DateTimeOffset.FromUnixTimeSeconds(x.time) - targetTime).Hours) <= 1)
+                    .Where(x => Math.Abs((DateTimeOffset.FromUnixTimeSeconds(x.time) - retVal.TargetTime.Value).Hours) <= 1)
                     .ToList();
 
-                if (!range.Any(x => x.precipIntensity > 0)) return $"Clear skys around {targetTime.Humanize(dateToCompareAgainst: now)} when you want to leave!";
+                if (!range.Any(x => x.precipIntensity > 0)) return retVal;
 
-                bestTimeToLeave = range.MinBy(x => x.precipIntensity);
+                retVal.BestTimeToLeave = range.MinBy(x => x.precipIntensity);
             }
 
-            return bestTimeToLeave == null ? "No result found" : $"The best time to leave about {targetTime.Humanize(dateToCompareAgainst: now)} is {DateTimeOffset.FromUnixTimeSeconds(bestTimeToLeave.time).Humanize(homeDateTimeOffset)}.";
+            return retVal;
         }
 
-        public async Task<string> GetTrafficAdvice(double latitude, double longitude, int travelTime)
+        public async Task<WeatherBasedTrafficAdvice> GetTrafficAdvice(double latitude, double longitude, int travelTime)
         //TODO: I hate this, fix it
         {
             var forecast = await _forecastService.GetForecast(latitude, longitude);
-            var currently = forecast.Currently;
+            var retVal = new WeatherBasedTrafficAdvice { Currently = forecast.Currently };
             var forecasts = forecast.MinutelyData?.ToList();
 
-            if (currently == null || forecasts == null) return "No data found";
+            if (retVal.Currently == null || forecasts == null) return retVal;
 
-            var bestTimeToLeaveWork = forecasts.Any() ? forecasts.MinimumPrecipitation(travelTime)?.FirstOrDefault() : null;
+            retVal.BestTimeToLeave = forecasts.Any() ? forecasts.MinimumPrecipitation(travelTime)?.FirstOrDefault() : null;
 
-            forecasts.AddRange(forecast.HourlyData.Where(x => !forecasts.Any() || (x.time > forecasts.Last().time && x.time > currently.time)));
-            if (!forecasts.Any()) return "No data found";
+            forecasts.AddRange(forecast.HourlyData.Where(x => !forecasts.Any() || (x.time > forecasts.Last().time && x.time > retVal.Currently.time)));
+            if (!forecasts.Any()) return retVal;
 
-            var nextModeratePrecipitation = forecasts.FirstOrDefault(x => x.precipIntensity >= Weather.ModerateThreshold && x.time >= currently.time);
+            retVal.NextModeratePrecipitation = forecasts.FirstOrDefault(x => x.precipIntensity >= Weather.ModerateThreshold && x.time >= retVal.Currently.time);
 
-            var nextHeavyPrecipitation = forecasts.FirstOrDefault(x => x.precipIntensity >= Weather.HeavyThreshold && x.time >= currently.time);
+            retVal.NextHeavyPrecipitation = forecasts.FirstOrDefault(x => x.precipIntensity >= Weather.HeavyThreshold && x.time >= retVal.Currently.time);
 
-            var sb = new StringBuilder();
-            var homeDateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(currently.time);
-
-            if (currently.precipIntensity > 0) {
-                var minimumPrecipitation =
+            if (retVal.Currently.precipIntensity > 0) {
+                retVal.MinimumPrecipitation =
                     forecasts.FirstOrDefault(
                         x =>
                             x.precipIntensity.Equals(forecasts.Min(y => y.precipIntensity)) &&
-                            x.time >= currently.time);
+                            x.time >= retVal.Currently.time);
 
-                var nextPrecipitationAfterMinimum =
+                retVal.NextPrecipitationAfterMinimum =
                     forecasts.FirstOrDefault(
                         x =>
                             x.precipIntensity > Weather.MeasurableThreshold &&
-                            x.precipIntensity > minimumPrecipitation?.precipIntensity &&
-                            x.time >= minimumPrecipitation.time);
-
-                if (bestTimeToLeaveWork != null) {
-                    sb.AppendLine($"The best time to leave in the next hour is {DateTimeOffset.FromUnixTimeSeconds(bestTimeToLeaveWork.time).Humanize(homeDateTimeOffset)}.");
-                }
-
-                if (minimumPrecipitation != null) {
-                    sb.AppendLine($"{currently.precipType.Transform(To.SentenceCase)} reaches lowest point {DateTimeOffset.FromUnixTimeSeconds(minimumPrecipitation.time).Humanize(homeDateTimeOffset)}.");
-                }
-
-                if (nextPrecipitationAfterMinimum != null) {
-                    sb.AppendLine($"{nextPrecipitationAfterMinimum.precipType.Transform(To.SentenceCase)} starting again after lowest point {DateTimeOffset.FromUnixTimeSeconds(nextPrecipitationAfterMinimum.time).Humanize(homeDateTimeOffset)}.");
-                }
-
-                if (nextModeratePrecipitation != null) {
-                    sb.AppendLine($"{(nextModeratePrecipitation.precipType ?? currently.precipType).Transform(To.SentenceCase)} getting worse {DateTimeOffset.FromUnixTimeSeconds(nextModeratePrecipitation.time).Humanize(homeDateTimeOffset)}.");
-                }
-
-                if (nextHeavyPrecipitation != null) {
-                    sb.AppendLine($"{(nextHeavyPrecipitation.precipType ?? currently.precipType).Transform(To.SentenceCase)} getting much worse {DateTimeOffset.FromUnixTimeSeconds(nextHeavyPrecipitation.time).Humanize(homeDateTimeOffset)}.");
-                }
+                            x.precipIntensity > retVal.MinimumPrecipitation?.precipIntensity &&
+                            x.time >= retVal.MinimumPrecipitation.time);
             }
             else {
-                var nextPrecipitation = forecasts.FirstOrDefault(x => x.precipIntensity > Weather.MeasurableThreshold && x.time >= currently.time);
-
-                if (nextPrecipitation?.precipType != null) {
-                    sb.AppendLine($"Next light {nextPrecipitation.precipType} is {DateTimeOffset.FromUnixTimeSeconds(nextPrecipitation.time).Humanize(homeDateTimeOffset)}.");
-                }
-                if (nextModeratePrecipitation?.precipType != null) {
-                    sb.AppendLine($"Next moderate {nextModeratePrecipitation.precipType} is {DateTimeOffset.FromUnixTimeSeconds(nextModeratePrecipitation.time).Humanize(homeDateTimeOffset)}.");
-                }
-                if (nextHeavyPrecipitation?.precipType != null) {
-                    sb.AppendLine($"Next heavy {nextHeavyPrecipitation.precipType} is {DateTimeOffset.FromUnixTimeSeconds(nextHeavyPrecipitation.time).Humanize(homeDateTimeOffset)}.");
-                }
+                retVal.NextPrecipitation = forecasts.FirstOrDefault(x => x.precipIntensity > Weather.MeasurableThreshold && x.time >= retVal.Currently.time);
             }
 
-            return sb.Length != 0 ? sb.ToString() : "Clear skies for as far I can see!";
+            return retVal;
         }
     }
 }

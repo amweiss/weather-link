@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using WeatherLink.Models;
 
 namespace WeatherLink.Services {
 
@@ -15,7 +16,7 @@ namespace WeatherLink.Services {
         /// <param name="hoursFromNow">The hours from the current time to get traffice advice for.</param>
         /// <param name="travelTime">The duration of the trip normally in minutes.</param>
         /// <returns>A string of traffic advice.</returns>
-        Task<string> GetTrafficAdviceForATime(double latitude, double longitude, double hoursFromNow, int travelTime = 20);
+        Task<WeatherBasedTrafficAdvice> GetTrafficAdviceForATime(double latitude, double longitude, double hoursFromNow, int travelTime = 20);
 
         /// <summary>
         /// Get traffic advice for a given location.
@@ -24,6 +25,6 @@ namespace WeatherLink.Services {
         /// <param name="longitude">The longitude in degrees.</param>
         /// <param name="travelTime">The duration of the trip normally in minutes.</param>
         /// <returns>A string of traffic advice</returns>
-        Task<string> GetTrafficAdvice(double latitude, double longitude, int travelTime = 20);
+        Task<WeatherBasedTrafficAdvice> GetTrafficAdvice(double latitude, double longitude, int travelTime = 20);
     }
 }
