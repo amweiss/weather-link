@@ -21,5 +21,15 @@ namespace WeatherLink.Models {
         /// The collection of future weather by the minute.
         /// </summary>
         public IEnumerable<Weather> MinutelyData { get; set; }
+
+        /// <summary>
+        /// The data source.
+        /// </summary>
+        public string DataSource { get; set; }
+
+        /// <summary>
+        /// Text to show where the data comes from.
+        /// </summary>
+        public string AttributionLine { get; set; }
     }
 }

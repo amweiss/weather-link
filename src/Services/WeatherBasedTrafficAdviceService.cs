@@ -22,7 +22,7 @@ namespace WeatherLink.Services {
             var forecast = await _forecastService.GetForecast(latitude, longitude);
             if (forecast?.HourlyData == null) return null;
 
-            var retVal = new WeatherBasedTrafficAdvice { Currently = forecast.Currently };
+            var retVal = new WeatherBasedTrafficAdvice { Currently = forecast.Currently, DataSource = forecast.DataSource, AttributionLine = forecast.AttributionLine };
 
             var forecasts = forecast.MinutelyData?.ToList();
             if (forecasts != null) {
@@ -65,7 +65,7 @@ namespace WeatherLink.Services {
         //TODO: I hate this, fix it
         {
             var forecast = await _forecastService.GetForecast(latitude, longitude);
-            var retVal = new WeatherBasedTrafficAdvice { Currently = forecast.Currently };
+            var retVal = new WeatherBasedTrafficAdvice { Currently = forecast.Currently, DataSource = forecast.DataSource, AttributionLine = forecast.AttributionLine };
             var forecasts = forecast.MinutelyData?.ToList();
 
             if (retVal.Currently == null || forecasts == null) return retVal;

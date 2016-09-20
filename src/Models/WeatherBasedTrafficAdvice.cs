@@ -51,12 +51,12 @@ namespace WeatherLink.Models {
         /// <summary>
         /// The data source.
         /// </summary>
-        public string DataSource => "http://forecast.io/";
+        public string DataSource { get; set; }
 
         /// <summary>
         /// Text to show where the data comes from.
         /// </summary>
-        public string AttributionLine => "Powered by Forecast";
+        public string AttributionLine { get; set; }
 
         /// <summary>
         /// Convert the advice to a human readable string.

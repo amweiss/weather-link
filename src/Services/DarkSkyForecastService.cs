@@ -13,6 +13,9 @@ namespace WeatherLink.Services {
     class DarkSkyForecastService : IForecastService {
         readonly IOptions<WeatherLinkSettings> _optionsAccessor;
 
+        readonly String _dataSource = "https://darksky.net/poweredby/";
+        readonly String _attributionLine = "Powered by Dark Sky";
+
         public DarkSkyForecastService(IOptions<WeatherLinkSettings> optionsAccessor) {
             _optionsAccessor = optionsAccessor;
         }
@@ -51,8 +54,10 @@ namespace WeatherLink.Services {
             return new Forecast {
                 Currently = currently,
                 MinutelyData = minutelyData,
-                HourlyData = hourlyData
+                HourlyData = hourlyData,
+                DataSource = _dataSource,
+                AttributionLine = _attributionLine
             };
-        }
+    }
     }
 }
