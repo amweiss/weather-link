@@ -1,8 +1,6 @@
-﻿using Humanizer;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using WeatherLink.ExtensionMethods;
 using WeatherLink.Models;
