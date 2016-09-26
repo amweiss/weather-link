@@ -32,7 +32,6 @@ namespace WeatherLink {
 
             // Add custom services
             services.Configure<WeatherLinkSettings>(Configuration);
-            services.AddTransient<IForecastService, DarkSkyForecastService>();
             services.AddTransient<ITrafficAdviceService, WeatherBasedTrafficAdviceService>();
             services.AddTransient<IGeocodeService, GoogleMapsGeocodeService>();
             services.AddTransient<IDistanceToDurationService, GoogleMapsDistanceToDurationService>();

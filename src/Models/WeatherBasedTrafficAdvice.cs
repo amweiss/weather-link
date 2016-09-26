@@ -1,6 +1,7 @@
 ﻿using Humanizer;
 using System;
 using System.Text;
+using DarkSky.Models;
 
 namespace WeatherLink.Models {
 
@@ -16,37 +17,37 @@ namespace WeatherLink.Models {
         /// <summary>
         /// The point in time and precipitation for the time closest to the current time.
         /// </summary>
-        public Weather Currently { get; set; }
+        public DataPoint Currently { get; set; }
 
         /// <summary>
         /// The point in time that would be the best to leave based on the weather.
         /// </summary>
-        public Weather BestTimeToLeave { get; set; }
+        public DataPoint BestTimeToLeave { get; set; }
 
         /// <summary>
         /// The point in time with the next measurable precipitation.
         /// </summary>
-        public Weather NextPrecipitation { get; set; }
+        public DataPoint NextPrecipitation { get; set; }
 
         /// <summary>
         /// The point in time with the minimum precipitation.
         /// </summary>
-        public Weather MinimumPrecipitation { get; set; }
+        public DataPoint MinimumPrecipitation { get; set; }
 
         /// <summary>
         /// The next point in time that has measurable precipitation after the next minimum level of precipitation.
         /// </summary>
-        public Weather NextPrecipitationAfterMinimum { get; set; }
+        public DataPoint NextPrecipitationAfterMinimum { get; set; }
 
         /// <summary>
         /// The next point in time for moderate precipitation.
         /// </summary>
-        public Weather NextModeratePrecipitation { get; set; }
+        public DataPoint NextModeratePrecipitation { get; set; }
 
         /// <summary>
         /// The next point in time for heavy precipitation.
         /// </summary>
-        public Weather NextHeavyPrecipitation { get; set; }
+        public DataPoint NextHeavyPrecipitation { get; set; }
 
         /// <summary>
         /// The data source.
@@ -63,45 +64,45 @@ namespace WeatherLink.Models {
         /// </summary>
         /// <returns>Traffic advice in text format.</returns>
         public override string ToString() {
-            var homeDateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(Currently.time);
+            var homeDateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(Currently.Time);
 
             if (TargetTime.HasValue) {
                 var now = homeDateTimeOffset.UtcDateTime;
                 return BestTimeToLeave != null 
-                    ? $"The best time to leave about {TargetTime.Humanize(dateToCompareAgainst: now)} is {DateTimeOffset.FromUnixTimeSeconds(BestTimeToLeave.time).Humanize(homeDateTimeOffset)}."
+                    ? $"The best time to leave about {TargetTime.Humanize(dateToCompareAgainst: now)} is {DateTimeOffset.FromUnixTimeSeconds(BestTimeToLeave.Time).Humanize(homeDateTimeOffset)}."
                     : $"Clear skys around {TargetTime.Humanize(dateToCompareAgainst: now)} when you want to leave!";
             } else {
                 var sb = new StringBuilder();
-                if (Currently.precipIntensity > 0) {
+                if (Currently.PrecipIntensity > 0) {
 
                     if (BestTimeToLeave != null) {
-                        sb.AppendLine($"The best time to leave in the next hour is {DateTimeOffset.FromUnixTimeSeconds(BestTimeToLeave.time).Humanize(homeDateTimeOffset)}.");
+                        sb.AppendLine($"The best time to leave in the next hour is {DateTimeOffset.FromUnixTimeSeconds(BestTimeToLeave.Time).Humanize(homeDateTimeOffset)}.");
                     }
 
                     if (MinimumPrecipitation != null) {
-                        sb.AppendLine($"{Currently.precipType.Transform(To.SentenceCase)} reaches lowest point {DateTimeOffset.FromUnixTimeSeconds(MinimumPrecipitation.time).Humanize(homeDateTimeOffset)}.");
+                        sb.AppendLine($"{Currently.PrecipType.Transform(To.SentenceCase)} reaches lowest point {DateTimeOffset.FromUnixTimeSeconds(MinimumPrecipitation.Time).Humanize(homeDateTimeOffset)}.");
                     }
 
                     if (NextPrecipitationAfterMinimum != null) {
-                        sb.AppendLine($"{NextPrecipitationAfterMinimum.precipType.Transform(To.SentenceCase)} starting again after lowest point {DateTimeOffset.FromUnixTimeSeconds(NextPrecipitationAfterMinimum.time).Humanize(homeDateTimeOffset)}.");
+                        sb.AppendLine($"{NextPrecipitationAfterMinimum.PrecipType.Transform(To.SentenceCase)} starting again after lowest point {DateTimeOffset.FromUnixTimeSeconds(NextPrecipitationAfterMinimum.Time).Humanize(homeDateTimeOffset)}.");
                     }
 
                     if (NextModeratePrecipitation != null) {
-                        sb.AppendLine($"{(NextModeratePrecipitation.precipType ?? Currently.precipType).Transform(To.SentenceCase)} getting worse {DateTimeOffset.FromUnixTimeSeconds(NextModeratePrecipitation.time).Humanize(homeDateTimeOffset)}.");
+                        sb.AppendLine($"{(NextModeratePrecipitation.PrecipType ?? Currently.PrecipType).Transform(To.SentenceCase)} getting worse {DateTimeOffset.FromUnixTimeSeconds(NextModeratePrecipitation.Time).Humanize(homeDateTimeOffset)}.");
                     }
 
                     if (NextHeavyPrecipitation != null) {
-                        sb.AppendLine($"{(NextHeavyPrecipitation.precipType ?? Currently.precipType).Transform(To.SentenceCase)} getting much worse {DateTimeOffset.FromUnixTimeSeconds(NextHeavyPrecipitation.time).Humanize(homeDateTimeOffset)}.");
+                        sb.AppendLine($"{(NextHeavyPrecipitation.PrecipType ?? Currently.PrecipType).Transform(To.SentenceCase)} getting much worse {DateTimeOffset.FromUnixTimeSeconds(NextHeavyPrecipitation.Time).Humanize(homeDateTimeOffset)}.");
                     }
                 } else {
-                    if (NextPrecipitation?.precipType != null) {
-                        sb.AppendLine($"Next light {NextPrecipitation.precipType} is {DateTimeOffset.FromUnixTimeSeconds(NextPrecipitation.time).Humanize(homeDateTimeOffset)}.");
+                    if (NextPrecipitation?.PrecipType != null) {
+                        sb.AppendLine($"Next light {NextPrecipitation.PrecipType} is {DateTimeOffset.FromUnixTimeSeconds(NextPrecipitation.Time).Humanize(homeDateTimeOffset)}.");
                     }
-                    if (NextModeratePrecipitation?.precipType != null) {
-                        sb.AppendLine($"Next moderate {NextModeratePrecipitation.precipType} is {DateTimeOffset.FromUnixTimeSeconds(NextModeratePrecipitation.time).Humanize(homeDateTimeOffset)}.");
+                    if (NextModeratePrecipitation?.PrecipType != null) {
+                        sb.AppendLine($"Next moderate {NextModeratePrecipitation.PrecipType} is {DateTimeOffset.FromUnixTimeSeconds(NextModeratePrecipitation.Time).Humanize(homeDateTimeOffset)}.");
                     }
-                    if (NextHeavyPrecipitation?.precipType != null) {
-                        sb.AppendLine($"Next heavy {NextHeavyPrecipitation.precipType} is {DateTimeOffset.FromUnixTimeSeconds(NextHeavyPrecipitation.time).Humanize(homeDateTimeOffset)}.");
+                    if (NextHeavyPrecipitation?.PrecipType != null) {
+                        sb.AppendLine($"Next heavy {NextHeavyPrecipitation.PrecipType} is {DateTimeOffset.FromUnixTimeSeconds(NextHeavyPrecipitation.Time).Humanize(homeDateTimeOffset)}.");
                     }
                 }
 

@@ -1,6 +1,6 @@
 {
 	"dependencies": {
-		"Newtonsoft.Json": "9.0.1",
+		"DarkSkyCore": "1.0.1",
 		"Humanizer.Core": "2.1.0",
 		"Swashbuckle.SwaggerGen": "6.0.0-beta902",
 		"Swashbuckle.SwaggerUi": "6.0.0-beta902",

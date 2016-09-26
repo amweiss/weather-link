@@ -4,34 +4,51 @@ using System.Linq;
 using System.Threading.Tasks;
 using WeatherLink.ExtensionMethods;
 using WeatherLink.Models;
+using DarkSky.Services;
 
 namespace WeatherLink.Services {
 
     class WeatherBasedTrafficAdviceService : ITrafficAdviceService {
         readonly IOptions<WeatherLinkSettings> _optionsAccessor;
-        readonly IForecastService _forecastService;
+        readonly DarkSkyService _darkSkyService;
 
-        public WeatherBasedTrafficAdviceService(IOptions<WeatherLinkSettings> optionsAccessor, IForecastService forecastRepository) {
+        /// <summary>
+        /// The threshold where percipitation is deemed measurable.
+        /// </summary>
+        public const double MeasurableThreshold = 0.005;
+
+        /// <summary>
+        /// The threshold where percipitation is deemed moderate.
+        /// </summary>
+        public const double ModerateThreshold = 0.1;
+
+        /// <summary>
+        /// The threshold where percipitation is deemed heavy.
+        /// </summary>
+        public const double HeavyThreshold = 0.4;
+
+        public WeatherBasedTrafficAdviceService(IOptions<WeatherLinkSettings> optionsAccessor) {
             _optionsAccessor = optionsAccessor;
-            _forecastService = forecastRepository;
+            _darkSkyService = new DarkSkyService(_optionsAccessor.Value.DarkSkyApiKey);
         }
 
         public async Task<WeatherBasedTrafficAdvice> GetTrafficAdviceForATime(double latitude, double longitude, double hoursFromNow, int travelTime) {
-            var forecast = await _forecastService.GetForecast(latitude, longitude);
-            if (forecast?.HourlyData == null) return null;
+            var forecastResponse = await _darkSkyService.GetForecast(latitude, longitude);
+            if (forecastResponse?.Response?.Hourly == null) return null;
 
-            var retVal = new WeatherBasedTrafficAdvice { Currently = forecast.Currently, DataSource = forecast.DataSource, AttributionLine = forecast.AttributionLine };
+            var forecast = forecastResponse.Response;
+            var retVal = new WeatherBasedTrafficAdvice { Currently = forecast.Currently, DataSource = forecastResponse?.DataSource, AttributionLine = forecastResponse?.AttributionLine };
 
-            var forecasts = forecast.MinutelyData?.ToList();
+            var forecasts = forecast.Minutely?.Data?.ToList();
             if (forecasts != null) {
                 forecasts.AddRange(
-                    forecast?.HourlyData.Where(x => !forecasts.Any() || (x.time > forecasts.Last().time && x.time > retVal.Currently.time)));
+                    forecast?.Hourly.Data.Where(x => !forecasts.Any() || (x.Time > forecasts.Last().Time && x.Time > retVal.Currently.Time)));
             }
             else {
-                forecasts = forecast.HourlyData.ToList();
+                forecasts = forecast.Hourly.Data.ToList();
             }
 
-            var homeDateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(retVal.Currently.time);
+            var homeDateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(retVal.Currently.Time);
             var now = homeDateTimeOffset.UtcDateTime;
             retVal.TargetTime = now.AddHours(hoursFromNow);
 
@@ -42,18 +59,18 @@ namespace WeatherLink.Services {
                 var targetUnixSeconds = new DateTimeOffset(retVal.TargetTime.Value).ToUnixTimeSeconds();
                 var afterTarget = 0;
 
-                while (afterTarget < forecasts.Count && forecasts[afterTarget].time < targetUnixSeconds) {
+                while (afterTarget < forecasts.Count && forecasts[afterTarget].Time < targetUnixSeconds) {
                     afterTarget++;
                 }
 
                 var range = forecasts.Skip(afterTarget - 2)
                     .Take(5)
-                    .Where(x => Math.Abs((DateTimeOffset.FromUnixTimeSeconds(x.time) - retVal.TargetTime.Value).Hours) <= 1)
+                    .Where(x => Math.Abs((DateTimeOffset.FromUnixTimeSeconds(x.Time) - retVal.TargetTime.Value).Hours) <= 1)
                     .ToList();
 
-                if (!range.Any(x => x.precipIntensity > 0)) return retVal;
+                if (!range.Any(x => x.PrecipIntensity > 0)) return retVal;
 
-                retVal.BestTimeToLeave = range.MinBy(x => x.precipIntensity);
+                retVal.BestTimeToLeave = range.MinBy(x => x.PrecipIntensity);
             }
 
             return retVal;
@@ -62,37 +79,40 @@ namespace WeatherLink.Services {
         public async Task<WeatherBasedTrafficAdvice> GetTrafficAdvice(double latitude, double longitude, int travelTime)
         //TODO: I hate this, fix it
         {
-            var forecast = await _forecastService.GetForecast(latitude, longitude);
-            var retVal = new WeatherBasedTrafficAdvice { Currently = forecast.Currently, DataSource = forecast.DataSource, AttributionLine = forecast.AttributionLine };
-            var forecasts = forecast.MinutelyData?.ToList();
+            var forecastResponse = await _darkSkyService.GetForecast(latitude, longitude);
+            if (forecastResponse?.Response?.Currently == null) return null;
+            var forecast = forecastResponse.Response;
+
+            var retVal = new WeatherBasedTrafficAdvice { Currently = forecast.Currently, DataSource = forecastResponse.DataSource, AttributionLine = forecastResponse.AttributionLine };
+            var forecasts = forecast.Minutely?.Data?.ToList();
 
             if (retVal.Currently == null || forecasts == null) return retVal;
 
             retVal.BestTimeToLeave = forecasts.Any() ? forecasts.MinimumPrecipitation(travelTime)?.FirstOrDefault() : null;
 
-            forecasts.AddRange(forecast.HourlyData.Where(x => !forecasts.Any() || (x.time > forecasts.Last().time && x.time > retVal.Currently.time)));
+            forecasts.AddRange(forecast.Hourly.Data.Where(x => !forecasts.Any() || (x.Time > forecasts.Last().Time && x.Time > retVal.Currently.Time)));
             if (!forecasts.Any()) return retVal;
 
-            retVal.NextModeratePrecipitation = forecasts.FirstOrDefault(x => x.precipIntensity >= Weather.ModerateThreshold && x.time >= retVal.Currently.time);
+            retVal.NextModeratePrecipitation = forecasts.FirstOrDefault(x => x.PrecipIntensity >= ModerateThreshold && x.Time >= retVal.Currently.Time);
 
-            retVal.NextHeavyPrecipitation = forecasts.FirstOrDefault(x => x.precipIntensity >= Weather.HeavyThreshold && x.time >= retVal.Currently.time);
+            retVal.NextHeavyPrecipitation = forecasts.FirstOrDefault(x => x.PrecipIntensity >= HeavyThreshold && x.Time >= retVal.Currently.Time);
 
-            if (retVal.Currently.precipIntensity > 0) {
+            if (retVal.Currently.PrecipIntensity > 0) {
                 retVal.MinimumPrecipitation =
                     forecasts.FirstOrDefault(
                         x =>
-                            x.precipIntensity.Equals(forecasts.Min(y => y.precipIntensity)) &&
-                            x.time >= retVal.Currently.time);
+                            x.PrecipIntensity.Equals(forecasts.Min(y => y.PrecipIntensity)) &&
+                            x.Time >= retVal.Currently.Time);
 
                 retVal.NextPrecipitationAfterMinimum =
                     forecasts.FirstOrDefault(
                         x =>
-                            x.precipIntensity > Weather.MeasurableThreshold &&
-                            x.precipIntensity > retVal.MinimumPrecipitation?.precipIntensity &&
-                            x.time >= retVal.MinimumPrecipitation.time);
+                            x.PrecipIntensity > MeasurableThreshold &&
+                            x.PrecipIntensity > retVal.MinimumPrecipitation?.PrecipIntensity &&
+                            x.Time >= retVal.MinimumPrecipitation.Time);
             }
             else {
-                retVal.NextPrecipitation = forecasts.FirstOrDefault(x => x.precipIntensity > Weather.MeasurableThreshold && x.time >= retVal.Currently.time);
+                retVal.NextPrecipitation = forecasts.FirstOrDefault(x => x.PrecipIntensity > MeasurableThreshold && x.Time >= retVal.Currently.Time);
             }
 
             return retVal;
