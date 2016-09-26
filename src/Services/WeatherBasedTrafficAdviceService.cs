@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using WeatherLink.ExtensionMethods;
 using WeatherLink.Models;
 using DarkSky.Services;
+using System.Collections.Generic;
 
 namespace WeatherLink.Services {
 
     class WeatherBasedTrafficAdviceService : ITrafficAdviceService {
         readonly IOptions<WeatherLinkSettings> _optionsAccessor;
         readonly DarkSkyService _darkSkyService;
+        readonly DarkSkyService.OptionalParameters _darkSkyParameters = new DarkSkyService.OptionalParameters() { DataBlocksToExclude = new List<string> { "daily", "alerts", "flags" } };
 
         /// <summary>
         /// The threshold where percipitation is deemed measurable.
@@ -33,7 +35,7 @@ namespace WeatherLink.Services {
         }
 
         public async Task<WeatherBasedTrafficAdvice> GetTrafficAdviceForATime(double latitude, double longitude, double hoursFromNow, int travelTime) {
-            var forecastResponse = await _darkSkyService.GetForecast(latitude, longitude);
+            var forecastResponse = await _darkSkyService.GetForecast(latitude, longitude, _darkSkyParameters);
             if (forecastResponse?.Response?.Hourly == null) return null;
 
             var forecast = forecastResponse.Response;
@@ -79,7 +81,7 @@ namespace WeatherLink.Services {
         public async Task<WeatherBasedTrafficAdvice> GetTrafficAdvice(double latitude, double longitude, int travelTime)
         //TODO: I hate this, fix it
         {
-            var forecastResponse = await _darkSkyService.GetForecast(latitude, longitude);
+            var forecastResponse = await _darkSkyService.GetForecast(latitude, longitude, _darkSkyParameters);
             if (forecastResponse?.Response?.Currently == null) return null;
             var forecast = forecastResponse.Response;
 
