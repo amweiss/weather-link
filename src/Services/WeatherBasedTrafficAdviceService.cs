@@ -1,18 +1,14 @@
-﻿using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using WeatherLink.ExtensionMethods;
 using WeatherLink.Models;
-using DarkSky.Services;
-using System.Collections.Generic;
 
-namespace WeatherLink.Services {
+namespace WeatherLink.Services
+{
 
     class WeatherBasedTrafficAdviceService : ITrafficAdviceService {
-        readonly IOptions<WeatherLinkSettings> _optionsAccessor;
-        readonly DarkSkyService _darkSkyService;
-        readonly DarkSkyService.OptionalParameters _darkSkyParameters = new DarkSkyService.OptionalParameters() { DataBlocksToExclude = new List<string> { "daily", "alerts", "flags" } };
+        readonly IDarkSkyService _darkSkyService;
 
         /// <summary>
         /// The threshold where percipitation is deemed measurable.
@@ -29,13 +25,12 @@ namespace WeatherLink.Services {
         /// </summary>
         public const double HeavyThreshold = 0.4;
 
-        public WeatherBasedTrafficAdviceService(IOptions<WeatherLinkSettings> optionsAccessor) {
-            _optionsAccessor = optionsAccessor;
-            _darkSkyService = new DarkSkyService(_optionsAccessor.Value.DarkSkyApiKey);
+        public WeatherBasedTrafficAdviceService(IDarkSkyService darkSkyService) {
+            _darkSkyService = darkSkyService;
         }
 
         public async Task<WeatherBasedTrafficAdvice> GetTrafficAdviceForATime(double latitude, double longitude, double hoursFromNow, int travelTime) {
-            var forecastResponse = await _darkSkyService.GetForecast(latitude, longitude, _darkSkyParameters);
+            var forecastResponse = await _darkSkyService.GetForecast(latitude, longitude);
             if (forecastResponse?.Response?.Hourly == null) return null;
 
             var forecast = forecastResponse.Response;
@@ -79,9 +74,8 @@ namespace WeatherLink.Services {
         }
 
         public async Task<WeatherBasedTrafficAdvice> GetTrafficAdvice(double latitude, double longitude, int travelTime)
-        //TODO: I hate this, fix it
         {
-            var forecastResponse = await _darkSkyService.GetForecast(latitude, longitude, _darkSkyParameters);
+            var forecastResponse = await _darkSkyService.GetForecast(latitude, longitude);
             if (forecastResponse?.Response?.Currently == null) return null;
             var forecast = forecastResponse.Response;
 

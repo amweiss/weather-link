@@ -35,6 +35,7 @@ namespace WeatherLink {
             services.AddTransient<ITrafficAdviceService, WeatherBasedTrafficAdviceService>();
             services.AddTransient<IGeocodeService, GoogleMapsGeocodeService>();
             services.AddTransient<IDistanceToDurationService, GoogleMapsDistanceToDurationService>();
+            services.AddTransient<IDarkSkyService, HourlyAndMinutelyDarkSkyService>();
 
             // Configure swagger
             services.AddSwaggerGen();
