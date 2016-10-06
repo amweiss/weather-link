@@ -1,7 +1,9 @@
 using DarkSky.Models;
 using DarkSky.Services;
 using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using WeatherLink.Models;
 
@@ -15,13 +17,38 @@ namespace WeatherLink.Services
         private readonly DarkSkyService.OptionalParameters _darkSkyParameters = new DarkSkyService.OptionalParameters() { DataBlocksToExclude = new List<string> { "daily", "alerts", "flags" } };
         private readonly DarkSkyService _darkSkyService;
 
+        private class StandardHttpClient : DarkSky.Services.IHttpClient
+        {
+            readonly string _baseUri = String.Empty;
+            public StandardHttpClient(string baseUri)
+            {
+                _baseUri = baseUri;
+            }
+
+            public async Task<HttpResponseMessage> HttpRequest(string requestString)
+            {
+                using (var handler = new HttpClientHandler())
+                {
+                    //if (handler.SupportsAutomaticDecompression)
+                    //{
+                    //    handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                    //}
+                    using (var client = new HttpClient(handler))
+                    {
+                        client.BaseAddress = new Uri(_baseUri);
+                        return await client.GetAsync(requestString);
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// An implementation of IDarkSkyService that exlcudes daily data, alert data, and flags data.
         /// </summary>
         /// <param name="optionsAccessor"></param>
         public HourlyAndMinutelyDarkSkyService(IOptions<WeatherLinkSettings> optionsAccessor)
         {
-            _darkSkyService = new DarkSkyService(optionsAccessor.Value.DarkSkyApiKey);
+            _darkSkyService = new DarkSkyService(optionsAccessor.Value.DarkSkyApiKey, new StandardHttpClient("https://api.darksky.net/"));
         }
 
         /// <summary>
