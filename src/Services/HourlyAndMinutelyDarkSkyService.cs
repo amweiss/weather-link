@@ -14,7 +14,7 @@ namespace WeatherLink.Services
     /// </summary>
     public class HourlyAndMinutelyDarkSkyService : IDarkSkyService
     {
-        private readonly DarkSkyService.OptionalParameters _darkSkyParameters = new DarkSkyService.OptionalParameters() { DataBlocksToExclude = new List<string> { "daily", "alerts", "flags" } };
+        private readonly DarkSkyService.OptionalParameters _darkSkyParameters = new DarkSkyService.OptionalParameters { DataBlocksToExclude = new List<string> { "daily", "alerts", "flags" } };
         private readonly DarkSkyService _darkSkyService;
 
         private class StandardHttpClient : DarkSky.Services.IHttpClient
