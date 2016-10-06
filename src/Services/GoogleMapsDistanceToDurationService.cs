@@ -1,9 +1,9 @@
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 using WeatherLink.Models;
 
 namespace WeatherLink.Services
@@ -13,7 +13,7 @@ namespace WeatherLink.Services
     /// </summary>
     public class GoogleMapsDistanceToDurationService : IDistanceToDurationService
     {
-        readonly IOptions<WeatherLinkSettings> _optionsAccessor;
+        private readonly IOptions<WeatherLinkSettings> _optionsAccessor;
 
         /// <summary>
         /// Create a new Google Maps Distance to Duration service based on optionsAccessor.
@@ -43,7 +43,7 @@ namespace WeatherLink.Services
                 double duration;
                 if (double.TryParse(parsedDuration?.ToString(), out duration))
                 {
-                    return (int)(duration/60.0);
+                    return (int)(duration / 60.0);
                 }
             }
 

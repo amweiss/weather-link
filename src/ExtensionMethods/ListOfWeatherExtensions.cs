@@ -1,12 +1,13 @@
+using DarkSky.Models;
 using System.Collections.Generic;
 using System.Linq;
-using DarkSky.Models;
 
-namespace WeatherLink.ExtensionMethods {
-
-    static class ListOfWeatherExtensions {
-
-        internal static IEnumerable<DataPoint> MinimumPrecipitation(this List<DataPoint> forecasts, int numberOfMinutes) {
+namespace WeatherLink.ExtensionMethods
+{
+    internal static class ListOfWeatherExtensions
+    {
+        internal static IEnumerable<DataPoint> MinimumPrecipitation(this List<DataPoint> forecasts, int numberOfMinutes)
+        {
             var currentSum = forecasts.Take(numberOfMinutes).Sum(x => x.PrecipIntensity);
 
             var minSum = currentSum;
@@ -14,10 +15,12 @@ namespace WeatherLink.ExtensionMethods {
             var start = 1;
             var i = numberOfMinutes;
 
-            while (start <= forecasts.Count - numberOfMinutes) {
+            while (start <= forecasts.Count - numberOfMinutes)
+            {
                 currentSum = currentSum - forecasts[start - 1].PrecipIntensity + forecasts[i].PrecipIntensity;
 
-                if (currentSum < minSum) {
+                if (currentSum < minSum)
+                {
                     minSum = currentSum;
                     minIndex = start;
                 }

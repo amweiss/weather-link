@@ -7,22 +7,24 @@ using System.Threading.Tasks;
 using WeatherLink.Models;
 using WeatherLink.Services;
 
-namespace WeatherLink.Controllers {
-
+namespace WeatherLink.Controllers
+{
     /// <summary>
     /// Provide traffic advice.
     /// </summary>
     [Route("trafficadvice")]
-    public class TrafficAdviceController : Controller {
-        readonly IOptions<WeatherLinkSettings> _optionsAccessor;
-        readonly ITrafficAdviceService _trafficAdviceService;
-        readonly IGeocodeService _geocodeService;
-        readonly IDistanceToDurationService _distanceToDurationService;
+    public class TrafficAdviceController : Controller
+    {
+        private readonly IOptions<WeatherLinkSettings> _optionsAccessor;
+        private readonly ITrafficAdviceService _trafficAdviceService;
+        private readonly IGeocodeService _geocodeService;
+        private readonly IDistanceToDurationService _distanceToDurationService;
 
         /// <summary>
         /// Access traffic advice via a web API.
         /// </summary>
-        public TrafficAdviceController(IOptions<WeatherLinkSettings> optionsAccessor, ITrafficAdviceService trafficAdviceService, IGeocodeService geocodeService, IDistanceToDurationService distanceToDurationService) {
+        public TrafficAdviceController(IOptions<WeatherLinkSettings> optionsAccessor, ITrafficAdviceService trafficAdviceService, IGeocodeService geocodeService, IDistanceToDurationService distanceToDurationService)
+        {
             _optionsAccessor = optionsAccessor;
             _trafficAdviceService = trafficAdviceService;
             _geocodeService = geocodeService;
@@ -37,9 +39,11 @@ namespace WeatherLink.Controllers {
         /// <returns>A string value describing when to leave based on the weather.</returns>
         [Route("{latitude}/{longitude}")]
         [HttpGet]
-        public async Task<WeatherBasedTrafficAdvice> GetTrafficAdvice(double latitude, double longitude) {
+        public async Task<WeatherBasedTrafficAdvice> GetTrafficAdvice(double latitude, double longitude)
+        {
             var result = await _trafficAdviceService.GetTrafficAdvice(latitude, longitude);
-            if (result == null) {
+            if (result == null)
+            {
                 Response.StatusCode = (int)HttpStatusCode.NoContent;
                 return null;
             }
@@ -54,15 +58,18 @@ namespace WeatherLink.Controllers {
         /// <returns>A string value describing when to leave based on the weather.</returns>
         [Route("{location}")]
         [HttpGet]
-        public async Task<WeatherBasedTrafficAdvice> GetTrafficAdvice(string location) {
+        public async Task<WeatherBasedTrafficAdvice> GetTrafficAdvice(string location)
+        {
             var target = await _geocodeService.Geocode(location);
-            if (target == null) {
+            if (target == null)
+            {
                 Response.StatusCode = (int)HttpStatusCode.NoContent;
                 return null;
             }
 
             var result = await _trafficAdviceService.GetTrafficAdvice(target.Item1, target.Item2);
-            if (result == null) {
+            if (result == null)
+            {
                 Response.StatusCode = (int)HttpStatusCode.NoContent;
                 return null;
             }
@@ -78,15 +85,18 @@ namespace WeatherLink.Controllers {
         /// <returns>A string value describing when to leave based on the weather.</returns>
         [Route("fortime/{time}/{location}")]
         [HttpGet]
-        public async Task<WeatherBasedTrafficAdvice> GetTrafficAdviceForATime(string location, double time) {
+        public async Task<WeatherBasedTrafficAdvice> GetTrafficAdviceForATime(string location, double time)
+        {
             var target = await _geocodeService.Geocode(location);
-            if (target == null) {
+            if (target == null)
+            {
                 Response.StatusCode = (int)HttpStatusCode.NoContent;
                 return null;
             }
 
             var result = await _trafficAdviceService.GetTrafficAdviceForATime(target.Item1, target.Item2, time);
-            if (result == null) {
+            if (result == null)
+            {
                 Response.StatusCode = (int)HttpStatusCode.NoContent;
                 return null;
             }
@@ -102,20 +112,23 @@ namespace WeatherLink.Controllers {
         /// <returns>A string value describing when to leave based on the weather.</returns>
         [Route("from/{startingLocation}/to/{endingLocation}")]
         [HttpGet]
-        public async Task<WeatherBasedTrafficAdvice> GetTrafficAdviceToALocation(string startingLocation, string endingLocation) {
+        public async Task<WeatherBasedTrafficAdvice> GetTrafficAdviceToALocation(string startingLocation, string endingLocation)
+        {
             var durationTask = _distanceToDurationService.TimeInMinutesBetweenLocations(startingLocation, endingLocation);
             var duration = await durationTask;
 
             var targetTask = _geocodeService.Geocode(startingLocation);
             var target = await targetTask;
 
-            if (duration == null || target == null) {
+            if (duration == null || target == null)
+            {
                 Response.StatusCode = (int)HttpStatusCode.NoContent;
                 return null;
             }
 
             var result = await _trafficAdviceService.GetTrafficAdvice(target.Item1, target.Item2, duration.Value);
-            if (result == null) {
+            if (result == null)
+            {
                 Response.StatusCode = (int)HttpStatusCode.NoContent;
                 return null;
             }
@@ -132,20 +145,23 @@ namespace WeatherLink.Controllers {
         /// <returns>A string value describing when to leave based on the weather.</returns>
         [Route("fortime/{time}/from/{startingLocation}/to/{endingLocation}")]
         [HttpGet]
-        public async Task<WeatherBasedTrafficAdvice> GetTrafficAdviceToALocationForATime(string startingLocation, string endingLocation, double time) {
+        public async Task<WeatherBasedTrafficAdvice> GetTrafficAdviceToALocationForATime(string startingLocation, string endingLocation, double time)
+        {
             var durationTask = _distanceToDurationService.TimeInMinutesBetweenLocations(startingLocation, endingLocation);
             var durationResult = await durationTask;
 
             var targetTask = _geocodeService.Geocode(startingLocation);
             var targetResult = await targetTask;
 
-            if (durationResult == null || targetResult == null) {
+            if (durationResult == null || targetResult == null)
+            {
                 Response.StatusCode = (int)HttpStatusCode.NoContent;
                 return null;
             }
 
             var result = await _trafficAdviceService.GetTrafficAdviceForATime(targetResult.Item1, targetResult.Item2, time, durationResult.Value);
-            if (result == null) {
+            if (result == null)
+            {
                 Response.StatusCode = (int)HttpStatusCode.NoContent;
                 return null;
             }
@@ -161,8 +177,10 @@ namespace WeatherLink.Controllers {
         /// <returns>A string value describing when to leave based on the weather.</returns>
         [Route("slack")]
         [HttpPost]
-        public async Task<SlackResponse> SlackIntegration(string text, string token) {
-            if (!_optionsAccessor.Value.SlackTokens.Contains(token)) {
+        public async Task<SlackResponse> SlackIntegration(string text, string token)
+        {
+            if (!_optionsAccessor.Value.SlackTokens.Contains(token))
+            {
                 Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 return null;
             }
@@ -171,7 +189,8 @@ namespace WeatherLink.Controllers {
 
             var advice = (WeatherBasedTrafficAdvice)null;
 
-            if (checkCommand.Success) {
+            if (checkCommand.Success)
+            {
                 var hours = checkCommand.Groups?[1]?.Value;
                 var startingLocation = checkCommand.Groups?[2]?.Value;
                 var endingLocation = checkCommand.Groups?[3]?.Value;
@@ -179,27 +198,33 @@ namespace WeatherLink.Controllers {
                 double hoursFromNow;
                 var hasHours = double.TryParse(hours, out hoursFromNow);
 
-                if ((hasHours && hoursFromNow < 0) || startingLocation == null) {
+                if ((hasHours && hoursFromNow < 0) || startingLocation == null)
+                {
                     Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     return null;
                 }
 
                 // TODO: Find better way?
-                if (string.IsNullOrWhiteSpace(endingLocation) && hasHours) {
+                if (string.IsNullOrWhiteSpace(endingLocation) && hasHours)
+                {
                     advice = await GetTrafficAdviceForATime(startingLocation, hoursFromNow);
                 }
-                else if (!string.IsNullOrWhiteSpace(endingLocation) && !hasHours) {
+                else if (!string.IsNullOrWhiteSpace(endingLocation) && !hasHours)
+                {
                     advice = await GetTrafficAdviceToALocation(startingLocation, endingLocation);
                 }
-                else if (!string.IsNullOrWhiteSpace(endingLocation) && hasHours) {
+                else if (!string.IsNullOrWhiteSpace(endingLocation) && hasHours)
+                {
                     advice = await GetTrafficAdviceToALocationForATime(startingLocation, endingLocation, hoursFromNow);
                 }
-                else {
+                else
+                {
                     advice = await GetTrafficAdvice(startingLocation);
                 }
             }
 
-            if (advice == null) {
+            if (advice == null)
+            {
                 Response.StatusCode = (int)HttpStatusCode.NoContent;
                 return null;
             }

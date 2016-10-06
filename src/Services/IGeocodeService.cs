@@ -1,13 +1,13 @@
 using System;
 using System.Threading.Tasks;
 
-namespace WeatherLink.Services {
-
+namespace WeatherLink.Services
+{
     /// <summary>
     /// A service to convert an address to a latitude and longitude.
     /// </summary>
-    public interface IGeocodeService {
-
+    public interface IGeocodeService
+    {
         /// <summary>
         /// Convert address to a latitude and longitude Tuple.
         /// </summary>

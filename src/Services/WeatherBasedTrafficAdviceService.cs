@@ -6,9 +6,9 @@ using WeatherLink.Models;
 
 namespace WeatherLink.Services
 {
-
-    class WeatherBasedTrafficAdviceService : ITrafficAdviceService {
-        readonly IDarkSkyService _darkSkyService;
+    internal class WeatherBasedTrafficAdviceService : ITrafficAdviceService
+    {
+        private readonly IDarkSkyService _darkSkyService;
 
         /// <summary>
         /// The threshold where percipitation is deemed measurable.
@@ -25,11 +25,13 @@ namespace WeatherLink.Services
         /// </summary>
         public const double HeavyThreshold = 0.4;
 
-        public WeatherBasedTrafficAdviceService(IDarkSkyService darkSkyService) {
+        public WeatherBasedTrafficAdviceService(IDarkSkyService darkSkyService)
+        {
             _darkSkyService = darkSkyService;
         }
 
-        public async Task<WeatherBasedTrafficAdvice> GetTrafficAdviceForATime(double latitude, double longitude, double hoursFromNow, int travelTime) {
+        public async Task<WeatherBasedTrafficAdvice> GetTrafficAdviceForATime(double latitude, double longitude, double hoursFromNow, int travelTime)
+        {
             var forecastResponse = await _darkSkyService.GetForecast(latitude, longitude);
             if (forecastResponse?.Response?.Hourly == null) return null;
 
@@ -37,11 +39,13 @@ namespace WeatherLink.Services
             var retVal = new WeatherBasedTrafficAdvice { Currently = forecast.Currently, DataSource = forecastResponse?.DataSource, AttributionLine = forecastResponse?.AttributionLine };
 
             var forecasts = forecast.Minutely?.Data?.ToList();
-            if (forecasts != null) {
+            if (forecasts != null)
+            {
                 forecasts.AddRange(
                     forecast?.Hourly.Data.Where(x => !forecasts.Any() || (x.Time > forecasts.Last().Time && x.Time > retVal.Currently.Time)));
             }
-            else {
+            else
+            {
                 forecasts = forecast.Hourly.Data.ToList();
             }
 
@@ -49,14 +53,17 @@ namespace WeatherLink.Services
             var now = homeDateTimeOffset.UtcDateTime;
             retVal.TargetTime = now.AddHours(hoursFromNow);
 
-            if (retVal.TargetTime - homeDateTimeOffset <= TimeSpan.FromHours(1)) {
+            if (retVal.TargetTime - homeDateTimeOffset <= TimeSpan.FromHours(1))
+            {
                 retVal.BestTimeToLeave = forecasts.Any() ? forecasts.MinimumPrecipitation(travelTime)?.FirstOrDefault() : null;
             }
-            else {
+            else
+            {
                 var targetUnixSeconds = new DateTimeOffset(retVal.TargetTime.Value).ToUnixTimeSeconds();
                 var afterTarget = 0;
 
-                while (afterTarget < forecasts.Count && forecasts[afterTarget].Time < targetUnixSeconds) {
+                while (afterTarget < forecasts.Count && forecasts[afterTarget].Time < targetUnixSeconds)
+                {
                     afterTarget++;
                 }
 
@@ -93,7 +100,8 @@ namespace WeatherLink.Services
 
             retVal.NextHeavyPrecipitation = forecasts.FirstOrDefault(x => x.PrecipIntensity >= HeavyThreshold && x.Time >= retVal.Currently.Time);
 
-            if (retVal.Currently.PrecipIntensity > 0) {
+            if (retVal.Currently.PrecipIntensity > 0)
+            {
                 retVal.MinimumPrecipitation =
                     forecasts.FirstOrDefault(
                         x =>
@@ -107,7 +115,8 @@ namespace WeatherLink.Services
                             x.PrecipIntensity > retVal.MinimumPrecipitation?.PrecipIntensity &&
                             x.Time >= retVal.MinimumPrecipitation.Time);
             }
-            else {
+            else
+            {
                 retVal.NextPrecipitation = forecasts.FirstOrDefault(x => x.PrecipIntensity > MeasurableThreshold && x.Time >= retVal.Currently.Time);
             }
 

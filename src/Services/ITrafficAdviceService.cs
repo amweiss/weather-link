@@ -1,13 +1,13 @@
 using System.Threading.Tasks;
 using WeatherLink.Models;
 
-namespace WeatherLink.Services {
-
+namespace WeatherLink.Services
+{
     /// <summary>
     /// A service to get traffic advice.
     /// </summary>
-    public interface ITrafficAdviceService {
-
+    public interface ITrafficAdviceService
+    {
         /// <summary>
         /// Get traffic advice for a given time and location.
         /// </summary>

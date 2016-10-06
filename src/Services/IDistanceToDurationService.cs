@@ -1,12 +1,12 @@
 using System.Threading.Tasks;
 
-namespace WeatherLink.Services {
-
+namespace WeatherLink.Services
+{
     /// <summary>
     /// A service for providing travel duration based on distances.
     /// </summary>
-    public interface IDistanceToDurationService {
-
+    public interface IDistanceToDurationService
+    {
         /// <summary>
         /// Find the travel time in minutes between two geocoded list.
         /// </summary>

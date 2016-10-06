@@ -1,12 +1,13 @@
-using System.Threading.Tasks;
 using DarkSky.Models;
+using System.Threading.Tasks;
 
 namespace WeatherLink.Services
 {
     /// <summary>
     /// A service to get a Dark Sky forecast for a latitude and longitude.
     /// </summary>
-    public interface IDarkSkyService {
+    public interface IDarkSkyService
+    {
         /// <summary>
         /// Make a request to get forecast data.
         /// </summary>

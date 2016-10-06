@@ -2,8 +2,6 @@
 	"dependencies": {
 		"DarkSkyCore": "1.0.2",
 		"Humanizer.Core": "2.1.0",
-		"Swashbuckle.SwaggerGen": "6.0.0-beta902",
-		"Swashbuckle.SwaggerUi": "6.0.0-beta902",
 		"Microsoft.AspNetCore.Server.IISIntegration": "1.0.0",
 		"Microsoft.Extensions.Configuration.EnvironmentVariables": "1.0.0",
 		"Microsoft.Extensions.Configuration.FileExtensions": "1.0.0",
@@ -14,7 +12,9 @@
 		"Microsoft.Extensions.Logging.Debug": "1.0.0",
 		"Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0",
 		"Microsoft.AspNetCore.Mvc": "1.0.1",
-		"Microsoft.AspNetCore.Server.Kestrel": "1.0.1"
+		"Microsoft.AspNetCore.Server.Kestrel": "1.0.1",
+		"Swashbuckle.SwaggerGen": "6.0.0-beta902",
+		"Swashbuckle.SwaggerUi": "6.0.0-beta902"
 	},
 	"tools": {
 		"Microsoft.AspNetCore.Server.IISIntegration.Tools": "1.0.0-preview2-final"
