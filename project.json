@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "DarkSkyCore": "1.0.2",
+    "DarkSkyCore": "1.0.5",
     "Humanizer.Core": "2.1.0",
     "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0",
     "Microsoft.Extensions.Configuration.EnvironmentVariables": "1.0.0",
