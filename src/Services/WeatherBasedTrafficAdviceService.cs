@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WeatherLink.ExtensionMethods;
 using WeatherLink.Models;
+using static MoreLinq.MoreEnumerable;
 
 namespace WeatherLink.Services
 {
