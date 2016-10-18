@@ -1,6 +1,6 @@
 {
 	"dependencies": {
-		"DarkSkyCore": "1.0.5",
+		"DarkSkyCore": "1.1.0",
 		"Humanizer.Core": "2.1.0",
 		"Microsoft.AspNetCore.Server.IISIntegration": "1.0.0",
 		"Microsoft.Extensions.Configuration.EnvironmentVariables": "1.0.0",
@@ -15,11 +15,11 @@
 		"Swashbuckle.SwaggerUi": "6.0.0-beta902",
 		"Microsoft.AspNetCore.Mvc": "1.0.1",
 		"Microsoft.AspNetCore.Server.Kestrel": "1.0.1",
-    "Microsoft.NETCore.App": {
-      "type": "platform",
-      "version": "1.0.1"
-    },
-    "morelinq": "2.0.0-beta05"
+		"Microsoft.NETCore.App": {
+			"type": "platform",
+			"version": "1.0.1"
+		},
+		"morelinq": "2.0.0-beta05"
 	},
 	"tools": {
 		"Microsoft.AspNetCore.Server.IISIntegration.Tools": "1.0.0-preview2-final"
