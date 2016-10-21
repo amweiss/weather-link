@@ -11,68 +11,68 @@ using WeatherLink.Services;
 
 namespace WeatherLink
 {
-    internal class Startup
-    {
-        public Startup(IHostingEnvironment env)
-        {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
-            Configuration = builder.Build();
-        }
+	internal class Startup
+	{
+		public Startup(IHostingEnvironment env)
+		{
+			var builder = new ConfigurationBuilder()
+				.SetBasePath(env.ContentRootPath)
+				.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+				.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+				.AddEnvironmentVariables();
+			Configuration = builder.Build();
+		}
 
-        public IConfigurationRoot Configuration { get; }
+		public IConfigurationRoot Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            // Add framework services
-            services.AddMvc();
-            services.AddOptions();
+		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+		public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
+		{
+			loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+			loggerFactory.AddDebug();
 
-            // Add custom services
-            services.Configure<WeatherLinkSettings>(Configuration);
-            services.AddTransient<ITrafficAdviceService, WeatherBasedTrafficAdviceService>();
-            services.AddTransient<IGeocodeService, GoogleMapsGeocodeService>();
-            services.AddTransient<IDistanceToDurationService, GoogleMapsDistanceToDurationService>();
-            services.AddTransient<IDarkSkyService, HourlyAndMinutelyDarkSkyService>();
+			app.UseStaticFiles();
 
-            // Configure swagger
-            services.AddSwaggerGen();
-            services.ConfigureSwaggerGen(options =>
-            {
-                options.SingleApiVersion(new Info
-                {
-                    Version = "v1",
-                    Title = "Weather Link",
-                    Description = "An API to get weather based advice.",
-                    TermsOfService = "None"
-                });
-                options.IncludeXmlComments(GetXmlCommentsPath());
-                options.DescribeAllEnumsAsStrings();
-            });
-        }
+			app.UseMvc();
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
-        {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
+			app.UseSwagger();
+			app.UseSwaggerUi();
+		}
 
-            app.UseStaticFiles();
+		// This method gets called by the runtime. Use this method to add services to the container.
+		public void ConfigureServices(IServiceCollection services)
+		{
+			// Add framework services
+			services.AddMvc();
+			services.AddOptions();
 
-            app.UseMvc();
+			// Add custom services
+			services.Configure<WeatherLinkSettings>(Configuration);
+			services.AddTransient<ITrafficAdviceService, WeatherBasedTrafficAdviceService>();
+			services.AddTransient<IGeocodeService, GoogleMapsGeocodeService>();
+			services.AddTransient<IDistanceToDurationService, GoogleMapsDistanceToDurationService>();
+			services.AddTransient<IDarkSkyService, HourlyAndMinutelyDarkSkyService>();
 
-            app.UseSwagger();
-            app.UseSwaggerUi();
-        }
+			// Configure swagger
+			services.AddSwaggerGen();
+			services.ConfigureSwaggerGen(options =>
+			{
+				options.SingleApiVersion(new Info
+				{
+					Version = "v1",
+					Title = "Weather Link",
+					Description = "An API to get weather based advice.",
+					TermsOfService = "None"
+				});
+				options.IncludeXmlComments(GetXmlCommentsPath());
+				options.DescribeAllEnumsAsStrings();
+			});
+		}
 
-        private string GetXmlCommentsPath()
-        {
-            var app = PlatformServices.Default.Application;
-            return Path.Combine(app.ApplicationBasePath, Path.ChangeExtension(app.ApplicationName, "xml"));
-        }
-    }
+		private string GetXmlCommentsPath()
+		{
+			var app = PlatformServices.Default.Application;
+			return Path.Combine(app.ApplicationBasePath, Path.ChangeExtension(app.ApplicationName, "xml"));
+		}
+	}
 }

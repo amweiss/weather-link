@@ -4,32 +4,32 @@ using System.Linq;
 
 namespace WeatherLink.ExtensionMethods
 {
-    internal static class ListOfWeatherExtensions
-    {
-        internal static IEnumerable<DataPoint> MinimumPrecipitation(this List<DataPoint> forecasts, int numberOfMinutes)
-        {
-            var currentSum = forecasts.Take(numberOfMinutes).Sum(x => x.PrecipIntensity);
+	internal static class ListOfWeatherExtensions
+	{
+		internal static IEnumerable<DataPoint> MinimumPrecipitation(this List<DataPoint> forecasts, int numberOfMinutes)
+		{
+			var currentSum = forecasts.Take(numberOfMinutes).Sum(x => x.PrecipIntensity);
 
-            var minSum = currentSum;
-            var minIndex = 0;
-            var start = 1;
-            var i = numberOfMinutes;
+			var minSum = currentSum;
+			var minIndex = 0;
+			var start = 1;
+			var i = numberOfMinutes;
 
-            while (start <= forecasts.Count - numberOfMinutes)
-            {
-                currentSum = currentSum - forecasts[start - 1].PrecipIntensity + forecasts[i].PrecipIntensity;
+			while (start <= forecasts.Count - numberOfMinutes)
+			{
+				currentSum = currentSum - forecasts[start - 1].PrecipIntensity + forecasts[i].PrecipIntensity;
 
-                if (currentSum < minSum)
-                {
-                    minSum = currentSum;
-                    minIndex = start;
-                }
+				if (currentSum < minSum)
+				{
+					minSum = currentSum;
+					minIndex = start;
+				}
 
-                i++;
-                start++;
-            }
+				i++;
+				start++;
+			}
 
-            return forecasts.Skip(minIndex).Take(numberOfMinutes);
-        }
-    }
+			return forecasts.Skip(minIndex).Take(numberOfMinutes);
+		}
+	}
 }
