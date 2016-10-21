@@ -185,9 +185,9 @@ namespace WeatherLink.Controllers
 				return null;
 			}
 
-			var checkCommand = Regex.Match(text, @"^(?:in (\d*[.,]?\d*) hours? from )?(.+?)(?: for (.+))?$");
-
 			var advice = (WeatherBasedTrafficAdvice)null;
+
+			var checkCommand = Regex.Match(text, @"^(?:in (\d*[.,]?\d*) hours? from )?(.+?)(?: for (.+))?$");
 
 			if (checkCommand.Success)
 			{
@@ -204,7 +204,6 @@ namespace WeatherLink.Controllers
 					return null;
 				}
 
-				// TODO: Find better way?
 				if (string.IsNullOrWhiteSpace(endingLocation) && hasHours)
 				{
 					advice = await GetTrafficAdviceForATime(startingLocation, hoursFromNow);
