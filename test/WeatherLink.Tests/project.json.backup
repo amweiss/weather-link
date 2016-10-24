@@ -22,13 +22,5 @@
         "portable-net451+win8"
       ]
     }
-  },
-  "publishOptions": {
-    "include": [
-      "Dockerfile.debug",
-      "Dockerfile",
-      "docker-compose.debug.yml",
-      "docker-compose.yml"
-    ]
   }
 }

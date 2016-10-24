@@ -1,0 +1,10 @@
+version: '2'
+
+services:
+  weatherlink.tests:
+    image: weatherlink.tests:debug
+    build:
+      context: .
+      dockerfile: Dockerfile.debug
+    environment:
+      - REMOTE_DEBUGGING
