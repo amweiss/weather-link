@@ -1,9 +1,6 @@
-﻿using System;
-using Xunit;
+﻿using Xunit;
 using DarkSky.Models;
 using System.Collections.Generic;
-using System.IO;
-using Newtonsoft.Json;
 using System.Linq;
 
 namespace WeatherLink.UnitTests.ExtensionMethods
