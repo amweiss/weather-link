@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using WeatherLink.ExtensionMethods;
+using DarkSky.Models;
 using WeatherLink.Models;
 using static MoreLinq.MoreEnumerable;
 
