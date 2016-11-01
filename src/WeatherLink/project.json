@@ -38,7 +38,7 @@
 		"warningsAsErrors": true,
 		"preserveCompilationContext": true,
 		"xmlDoc": true,
-    "debugType": "portable"
+		"debugType": "portable"
 	},
 	"runtimeOptions": {
 		"configProperties": {
