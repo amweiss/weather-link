@@ -1,8 +1,0 @@
-version: '2'
-
-services:
-  weatherlink.tests:
-    image: weatherlink.tests
-    build:
-      context: .
-      dockerfile: Dockerfile

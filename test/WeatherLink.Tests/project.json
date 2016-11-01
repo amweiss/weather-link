@@ -33,13 +33,5 @@
 			"Data/*"
 			]
     }
-  },
-  "publishOptions": {
-    "include": [
-      "Dockerfile.debug",
-      "Dockerfile",
-      "docker-compose.debug.yml",
-      "docker-compose.yml"
-    ]
   }
 }
