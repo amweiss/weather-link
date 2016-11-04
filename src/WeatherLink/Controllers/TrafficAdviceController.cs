@@ -37,8 +37,7 @@ namespace WeatherLink.Controllers
 		/// <param name="latitude">Latitude in degrees.</param>
 		/// <param name="longitude">Longitude in degrees.</param>
 		/// <returns>A string value describing when to leave based on the weather.</returns>
-		[Route("{latitude}/{longitude}")]
-		[HttpGet]
+		[HttpGet("{latitude}/{longitude}")]
 		public async Task<WeatherBasedTrafficAdvice> GetTrafficAdvice(double latitude, double longitude)
 		{
 			var result = await _trafficAdviceService.GetTrafficAdvice(latitude, longitude);
@@ -56,8 +55,7 @@ namespace WeatherLink.Controllers
 		/// </summary>
 		/// <param name="location">The string to translate into latitude and longitude.</param>
 		/// <returns>A string value describing when to leave based on the weather.</returns>
-		[Route("{location}")]
-		[HttpGet]
+		[HttpGet("{location}")]
 		public async Task<WeatherBasedTrafficAdvice> GetTrafficAdvice(string location)
 		{
 			var target = await _geocodeService.Geocode(location);
@@ -83,8 +81,7 @@ namespace WeatherLink.Controllers
 		/// <param name="location">The string to translate into latitude and longitude.</param>
 		/// <param name="time">The time in hours from now as decimal representation.</param>
 		/// <returns>A string value describing when to leave based on the weather.</returns>
-		[Route("fortime/{time}/{location}")]
-		[HttpGet]
+		[HttpGet("fortime/{time}/{location}")]
 		public async Task<WeatherBasedTrafficAdvice> GetTrafficAdviceForATime(string location, double time)
 		{
 			var target = await _geocodeService.Geocode(location);
@@ -110,8 +107,7 @@ namespace WeatherLink.Controllers
 		/// <param name="startingLocation">The starting location string to translate into latitude and longitude.</param>
 		/// <param name="endingLocation">The ending location string to translate into latitude and longitude.</param>
 		/// <returns>A string value describing when to leave based on the weather.</returns>
-		[Route("from/{startingLocation}/to/{endingLocation}")]
-		[HttpGet]
+		[HttpGet("from/{startingLocation}/to/{endingLocation}")]
 		public async Task<WeatherBasedTrafficAdvice> GetTrafficAdviceToALocation(string startingLocation, string endingLocation)
 		{
 			var durationTask = _distanceToDurationService.TimeInMinutesBetweenLocations(startingLocation, endingLocation);
@@ -143,8 +139,7 @@ namespace WeatherLink.Controllers
 		/// <param name="endingLocation">The ending location string to translate into latitude and longitude.</param>
 		/// <param name="time">The time in hours from now as decimal representation.</param>
 		/// <returns>A string value describing when to leave based on the weather.</returns>
-		[Route("fortime/{time}/from/{startingLocation}/to/{endingLocation}")]
-		[HttpGet]
+		[HttpGet("fortime/{time}/from/{startingLocation}/to/{endingLocation}")]
 		public async Task<WeatherBasedTrafficAdvice> GetTrafficAdviceToALocationForATime(string startingLocation, string endingLocation, double time)
 		{
 			var durationTask = _distanceToDurationService.TimeInMinutesBetweenLocations(startingLocation, endingLocation);
@@ -175,8 +170,7 @@ namespace WeatherLink.Controllers
 		/// <param name="text">The slack message, it should match "^(?:in (\d*[.,]?\d*) hours? from )?(.+?)(?: for (.+))?$"</param>
 		/// <param name="token">The slack token to verify it's a team that is setup in WeatherLinkSettings.SlackTokens.</param>
 		/// <returns>A string value describing when to leave based on the weather.</returns>
-		[Route("slack")]
-		[HttpPost]
+		[HttpPost("slack")]
 		public async Task<SlackResponse> SlackIntegration(string text, string token)
 		{
 			if (!_optionsAccessor.Value.SlackTokens.Contains(token))
