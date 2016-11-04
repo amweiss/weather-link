@@ -16,9 +16,9 @@ namespace WeatherLink
 		public Startup(IHostingEnvironment env)
 		{
 			var builder = new ConfigurationBuilder()
-				.SetBasePath($"{env.ContentRootPath}/src/WeatherLink")
-				.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-				.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+				.SetBasePath(env.ContentRootPath)
+				.AddJsonFile("src/WeatherLink/appsettings.json", optional: true, reloadOnChange: true)
+				.AddJsonFile($"src/WeatherLinkappsettings.{env.EnvironmentName}.json", optional: true)
 				.AddEnvironmentVariables();
 			Configuration = builder.Build();
 		}
