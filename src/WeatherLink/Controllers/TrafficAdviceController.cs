@@ -9,10 +9,10 @@ using WeatherLink.Services;
 
 namespace WeatherLink.Controllers
 {
-	/// <summary>
-	/// Provide traffic advice.
-	/// </summary>
-	[Route("trafficadvice")]
+    /// <summary>
+    /// Provide traffic advice.
+    /// </summary>
+    [Route("api/[controller]")]
 	public class TrafficAdviceController : Controller
 	{
 		private readonly IDistanceToDurationService _distanceToDurationService;
@@ -171,7 +171,7 @@ namespace WeatherLink.Controllers
 		/// <param name="token">The slack token to verify it's a team that is setup in WeatherLinkSettings.SlackTokens.</param>
 		/// <returns>A string value describing when to leave based on the weather.</returns>
 		[HttpPost("slack")]
-		public async Task<SlackResponse> SlackIntegration(string text, string token)
+		public async Task<SlackResponse> SlackIntegration([FromBody]string text, [FromBody]string token)
 		{
 			if (!_optionsAccessor.Value.SlackTokens.Contains(token))
 			{
@@ -189,10 +189,9 @@ namespace WeatherLink.Controllers
 				var startingLocation = checkCommand.Groups?[2]?.Value;
 				var endingLocation = checkCommand.Groups?[3]?.Value;
 
-				double hoursFromNow;
-				var hasHours = double.TryParse(hours, out hoursFromNow);
+                var hasHours = double.TryParse(hours, out double hoursFromNow);
 
-				if ((hasHours && hoursFromNow < 0) || startingLocation == null)
+                if ((hasHours && hoursFromNow < 0) || startingLocation == null)
 				{
 					Response.StatusCode = (int)HttpStatusCode.BadRequest;
 					return null;

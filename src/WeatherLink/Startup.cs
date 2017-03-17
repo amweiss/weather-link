@@ -4,14 +4,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
-using Swashbuckle.Swagger.Model;
+using Swashbuckle.AspNetCore.Swagger;
 using System.IO;
 using WeatherLink.Models;
 using WeatherLink.Services;
 
 namespace WeatherLink
 {
-	internal class Startup
+    internal class Startup
 	{
 		public Startup(IHostingEnvironment env)
 		{
@@ -38,7 +38,10 @@ namespace WeatherLink
 			app.UseMvc();
 
 			app.UseSwagger();
-			app.UseSwaggerUi();
+			app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "WeatherLink V1");
+            });
 		}
 
 		// This method gets called by the runtime. Use this method to add services to the container.
@@ -56,19 +59,18 @@ namespace WeatherLink
 			services.AddTransient<IDarkSkyService, HourlyAndMinutelyDarkSkyService>();
 
 			// Configure swagger
-			services.AddSwaggerGen();
-			services.ConfigureSwaggerGen(options =>
-			{
-				options.SingleApiVersion(new Info
-				{
-					Version = "v1",
-					Title = "Weather Link",
-					Description = "An API to get weather based advice.",
-					TermsOfService = "None"
-				});
-				options.IncludeXmlComments(GetXmlCommentsPath());
-				options.DescribeAllEnumsAsStrings();
-			});
+			services.AddSwaggerGen(c=>
+            {
+                c.SwaggerDoc("v1", new Info
+                {
+                    Title = "WeatherLink",
+                    Description = "An API to get weather based advice.",
+
+                });
+                c.IncludeXmlComments(GetXmlCommentsPath());
+                c.DescribeAllEnumsAsStrings();
+            }
+            );
 		}
 
 		private string GetXmlCommentsPath()
