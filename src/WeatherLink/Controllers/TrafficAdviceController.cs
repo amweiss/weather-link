@@ -9,10 +9,10 @@ using WeatherLink.Services;
 
 namespace WeatherLink.Controllers
 {
-    /// <summary>
-    /// Provide traffic advice.
-    /// </summary>
-    [Route("api/[controller]")]
+	/// <summary>
+	/// Provide traffic advice.
+	/// </summary>
+	[Route("api/[controller]")]
 	public class TrafficAdviceController : Controller
 	{
 		private readonly IDistanceToDurationService _distanceToDurationService;
@@ -189,9 +189,9 @@ namespace WeatherLink.Controllers
 				var startingLocation = checkCommand.Groups?[2]?.Value;
 				var endingLocation = checkCommand.Groups?[3]?.Value;
 
-                var hasHours = double.TryParse(hours, out double hoursFromNow);
+				var hasHours = double.TryParse(hours, out double hoursFromNow);
 
-                if ((hasHours && hoursFromNow < 0) || startingLocation == null)
+				if ((hasHours && hoursFromNow < 0) || startingLocation == null)
 				{
 					Response.StatusCode = (int)HttpStatusCode.BadRequest;
 					return null;

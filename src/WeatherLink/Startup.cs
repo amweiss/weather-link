@@ -11,7 +11,7 @@ using WeatherLink.Services;
 
 namespace WeatherLink
 {
-    internal class Startup
+	internal class Startup
 	{
 		public Startup(IHostingEnvironment env)
 		{
@@ -39,9 +39,9 @@ namespace WeatherLink
 
 			app.UseSwagger();
 			app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "WeatherLink V1");
-            });
+			{
+				c.SwaggerEndpoint("/swagger/v1/swagger.json", "WeatherLink V1");
+			});
 		}
 
 		// This method gets called by the runtime. Use this method to add services to the container.
@@ -59,18 +59,17 @@ namespace WeatherLink
 			services.AddTransient<IDarkSkyService, HourlyAndMinutelyDarkSkyService>();
 
 			// Configure swagger
-			services.AddSwaggerGen(c=>
-            {
-                c.SwaggerDoc("v1", new Info
-                {
-                    Title = "WeatherLink",
-                    Description = "An API to get weather based advice.",
-
-                });
-                c.IncludeXmlComments(GetXmlCommentsPath());
-                c.DescribeAllEnumsAsStrings();
-            }
-            );
+			services.AddSwaggerGen(c =>
+			{
+				c.SwaggerDoc("v1", new Info
+				{
+					Title = "WeatherLink",
+					Description = "An API to get weather based advice.",
+				});
+				c.IncludeXmlComments(GetXmlCommentsPath());
+				c.DescribeAllEnumsAsStrings();
+			}
+			);
 		}
 
 		private string GetXmlCommentsPath()
