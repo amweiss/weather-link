@@ -13,8 +13,16 @@
     <PackageTargetFallback>$(PackageTargetFallback);dotnet5.6;portable-net45+win8</PackageTargetFallback>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>WeatherLink.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>WeatherLink.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
-    <Content Update="wwwroot;appsettings.json;web.config">
+    <Content Update="wwwroot;appsettings.json;web.config;WeatherLink.xml">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
