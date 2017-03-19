@@ -171,7 +171,7 @@ namespace WeatherLink.Controllers
 		/// <param name="token">The slack token to verify it's a team that is setup in WeatherLinkSettings.SlackTokens.</param>
 		/// <returns>A string value describing when to leave based on the weather.</returns>
 		[HttpPost("slack")]
-		public async Task<SlackResponse> SlackIntegration([FromBody]string text, [FromBody]string token)
+		public async Task<SlackResponse> SlackIntegration(string text, string token)
 		{
 			if (!_optionsAccessor.Value.SlackTokens.Contains(token))
 			{
