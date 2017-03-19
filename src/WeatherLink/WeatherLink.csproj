@@ -14,18 +14,22 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>WeatherLink.xml</DocumentationFile>
+    <DocumentationFile>obj\Debug\netcoreapp1.1\WeatherLink.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>WeatherLink.xml</DocumentationFile>
+    <DocumentationFile>obj\Release\netcoreapp1.1\WeatherLink.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Update="wwwroot;appsettings.json;web.config;WeatherLink.xml">
+    <Content Update="wwwroot;appsettings.json;web.config">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="copy obj\$(ConfigurationName)\netcoreapp1.1\$(TargetName).xml $(OutDir)\$(TargetName).xml" />
+	</Target>
 
   <ItemGroup>
     <PackageReference Include="DarkSkyCore" Version="1.5.0" />
