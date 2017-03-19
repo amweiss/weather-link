@@ -29,6 +29,8 @@
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="copy obj\$(ConfigurationName)\netcoreapp1.1\$(TargetName).xml $(OutDir)\$(TargetName).xml" />
+		<Exec Command="copy obj\$(ConfigurationName)\netcoreapp1.1\$(TargetName).xml wwwroot\$(TargetName).xml" />
+
 	</Target>
 
   <ItemGroup>
