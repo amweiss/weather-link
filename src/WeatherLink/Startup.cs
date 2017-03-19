@@ -66,7 +66,7 @@ namespace WeatherLink
 					Title = "WeatherLink",
 					Description = "An API to get weather based advice.",
 				});
-				c.IncludeXmlComments(GetXmlCommentsPath());
+				//c.IncludeXmlComments(GetXmlCommentsPath());
 				c.DescribeAllEnumsAsStrings();
 			}
 			);

@@ -13,25 +13,9 @@
     <PackageTargetFallback>$(PackageTargetFallback);dotnet5.6;portable-net45+win8</PackageTargetFallback>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>obj\Debug\netcoreapp1.1\WeatherLink.xml</DocumentationFile>
+  <PropertyGroup>
+    <DocumentationFile>obj\$(Configuration)\netcoreapp1.1\WeatherLink.xml</DocumentationFile>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>obj\Release\netcoreapp1.1\WeatherLink.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <Content Update="wwwroot;appsettings.json;web.config">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
-
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="copy obj\$(ConfigurationName)\netcoreapp1.1\$(TargetName).xml $(OutDir)\$(TargetName).xml" />
-		<Exec Command="copy obj\$(ConfigurationName)\netcoreapp1.1\$(TargetName).xml $(WebDeployRoot)$(TargetName).xml" />
-
-	</Target>
 
   <ItemGroup>
     <PackageReference Include="DarkSkyCore" Version="1.5.0" />
