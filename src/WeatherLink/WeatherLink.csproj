@@ -11,10 +11,7 @@
     <PackageId>WeatherLink</PackageId>
     <RuntimeFrameworkVersion>1.1.1</RuntimeFrameworkVersion>
     <PackageTargetFallback>$(PackageTargetFallback);dotnet5.6;portable-net45+win8</PackageTargetFallback>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <DocumentationFile>obj\$(Configuration)\netcoreapp1.1\WeatherLink.xml</DocumentationFile>
+		<ExcludeXmlAssemblyFiles>false</ExcludeXmlAssemblyFiles>
   </PropertyGroup>
 
   <ItemGroup>
