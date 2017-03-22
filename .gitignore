@@ -252,3 +252,4 @@ paket-files/
 
 .vscode
 .DS_Store
+/src/WeatherLink/App_Data/WeatherLink.xml

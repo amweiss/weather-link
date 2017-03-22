@@ -66,16 +66,10 @@ namespace WeatherLink
 					Title = "WeatherLink",
 					Description = "An API to get weather based advice.",
 				});
-				//c.IncludeXmlComments(GetXmlCommentsPath());
+				c.IncludeXmlComments("App_Data/WeatherLink.xml");
 				c.DescribeAllEnumsAsStrings();
 			}
 			);
-		}
-
-		private string GetXmlCommentsPath()
-		{
-			var app = PlatformServices.Default.Application;
-			return Path.Combine(app.ApplicationBasePath, Path.ChangeExtension(app.ApplicationName, "xml"));
 		}
 	}
 }
