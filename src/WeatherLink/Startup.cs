@@ -2,10 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.PlatformAbstractions;
 using Swashbuckle.AspNetCore.Swagger;
-using System.IO;
 using WeatherLink.Models;
 using WeatherLink.Services;
 
@@ -26,11 +23,8 @@ namespace WeatherLink
 		public IConfigurationRoot Configuration { get; }
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
+		public void Configure(IApplicationBuilder app)
 		{
-			loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-			loggerFactory.AddDebug();
-
 			app.UseStaticFiles();
 
 			app.UseMvc();

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.IO;
 
 namespace WeatherLink
@@ -22,6 +23,12 @@ namespace WeatherLink
 							.Build();
 
 			var host = new WebHostBuilder()
+				.ConfigureLogging((context, factory) =>
+				{
+					factory.UseConfiguration(context.Configuration.GetSection("Logging"));
+					factory.AddConsole();
+					factory.AddDebug();
+				})
 				.UseConfiguration(config)
 				.UseKestrel()
 				.UseContentRoot(Directory.GetCurrentDirectory())

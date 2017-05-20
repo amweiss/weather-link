@@ -39,8 +39,8 @@ namespace WeatherLink.UnitTests.ExtensionMethods
 			var input = _trivialData.Take(3).ToList();
 			var result = input.MinimumPrecipitation(2);
 
-			Assert.Equal(result.ElementAt(0).Time, 0);
-			Assert.Equal(result.ElementAt(1).Time, 1);
+			Assert.Equal(0, result.ElementAt(0).Time);
+			Assert.Equal(1, result.ElementAt(1).Time);
 		}
 
 		[Fact]
@@ -49,21 +49,21 @@ namespace WeatherLink.UnitTests.ExtensionMethods
 			var input = _trivialData;
 			var result = input.MinimumPrecipitation(3);
 
-			Assert.Equal(result.ElementAt(0).Time, 3);
-			Assert.Equal(result.ElementAt(1).Time, 4);
-			Assert.Equal(result.ElementAt(2).Time, 5);
+			Assert.Equal(3, result.ElementAt(0).Time);
+			Assert.Equal(4, result.ElementAt(1).Time);
+			Assert.Equal(5, result.ElementAt(2).Time);
 		}
 
-		[Theory]
-		[InlineData(1)]
-		[InlineData(10)]
-		public void ReturnsNonEmptyEnumerable(int value)
-		{
-			var input = _trivialData;
-			var result = input.MinimumPrecipitation(value);
+		//[Theory]
+		//[InlineData(1)]
+		//[InlineData(10)]
+		//public void ReturnsNonEmptyEnumerable(int value)
+		//{
+		//	var input = _trivialData;
+		//	var result = input.MinimumPrecipitation(value);
 
-			Assert.NotEmpty(result);
-		}
+		//	Assert.NotEmpty(result);
+		//}
 
 		[Fact]
 		public void ZeroMinutesReturnsEmptyEnumerable()
