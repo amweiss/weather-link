@@ -71,9 +71,9 @@ namespace WeatherLink.Models
 			if (TargetTime.HasValue)
 			{
 				var now = homeDateTimeOffset.UtcDateTime;
-				return BestTimeToLeave != null
-					? $"The best time to leave about {TargetTime.Humanize(dateToCompareAgainst: now)} is {DateTimeOffset.FromUnixTimeSeconds(BestTimeToLeave.Time).Humanize(homeDateTimeOffset)}."
-					: $"Clear skys around {TargetTime.Humanize(dateToCompareAgainst: now)} when you want to leave!";
+				return BestTimeToLeave == null
+					? $"Clear skys around {TargetTime.Humanize(dateToCompareAgainst: now)} when you want to leave!"
+					: $"The best time to leave about {TargetTime.Humanize(dateToCompareAgainst: now)} is {DateTimeOffset.FromUnixTimeSeconds(BestTimeToLeave.Time).Humanize(homeDateTimeOffset)}.";
 			}
 			else
 			{
@@ -90,11 +90,6 @@ namespace WeatherLink.Models
 						sb.AppendLine($"{Currently.PrecipType.Transform(To.SentenceCase)} reaches lowest point {DateTimeOffset.FromUnixTimeSeconds(MinimumPrecipitation.Time).Humanize(homeDateTimeOffset)}.");
 					}
 
-					if (NextPrecipitationAfterMinimum != null)
-					{
-						sb.AppendLine($"{NextPrecipitationAfterMinimum.PrecipType.Transform(To.SentenceCase)} starting again after lowest point {DateTimeOffset.FromUnixTimeSeconds(NextPrecipitationAfterMinimum.Time).Humanize(homeDateTimeOffset)}.");
-					}
-
 					if (NextModeratePrecipitation != null)
 					{
 						sb.AppendLine($"{(NextModeratePrecipitation.PrecipType ?? Currently.PrecipType).Transform(To.SentenceCase)} getting worse {DateTimeOffset.FromUnixTimeSeconds(NextModeratePrecipitation.Time).Humanize(homeDateTimeOffset)}.");
@@ -103,6 +98,11 @@ namespace WeatherLink.Models
 					if (NextHeavyPrecipitation != null)
 					{
 						sb.AppendLine($"{(NextHeavyPrecipitation.PrecipType ?? Currently.PrecipType).Transform(To.SentenceCase)} getting much worse {DateTimeOffset.FromUnixTimeSeconds(NextHeavyPrecipitation.Time).Humanize(homeDateTimeOffset)}.");
+					}
+
+					if (NextPrecipitationAfterMinimum != null)
+					{
+						sb.AppendLine($"{NextPrecipitationAfterMinimum.PrecipType.Transform(To.SentenceCase)} starting again after lowest point {DateTimeOffset.FromUnixTimeSeconds(NextPrecipitationAfterMinimum.Time).Humanize(homeDateTimeOffset)}.");
 					}
 				}
 				else

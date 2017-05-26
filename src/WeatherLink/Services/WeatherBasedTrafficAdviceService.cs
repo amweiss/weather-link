@@ -54,17 +54,16 @@ namespace WeatherLink.Services
 			if (retVal.Currently.PrecipIntensity > 0)
 			{
 				retVal.MinimumPrecipitation =
-					forecasts.FirstOrDefault(
-						x =>
-							x.PrecipIntensity.Equals(forecasts.Min(y => y.PrecipIntensity)) &&
-							x.Time >= retVal.Currently.Time);
+					forecasts
+						.Where(x => x.Time >= retVal.Currently.Time)
+						.MinBy(x => x.PrecipIntensity);
 
 				retVal.NextPrecipitationAfterMinimum =
 					forecasts.FirstOrDefault(
 						x =>
-							x.PrecipIntensity > MeasurableThreshold &&
-							x.PrecipIntensity > retVal.MinimumPrecipitation?.PrecipIntensity &&
-							x.Time >= retVal.MinimumPrecipitation.Time);
+							x.Time > retVal.MinimumPrecipitation?.Time &&
+							x.PrecipIntensity > MeasurableThreshold
+							);
 			}
 			else
 			{
