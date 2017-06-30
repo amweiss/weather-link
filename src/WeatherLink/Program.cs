@@ -23,11 +23,11 @@ namespace WeatherLink
 							.Build();
 
 			var host = new WebHostBuilder()
-				.ConfigureLogging((context, factory) =>
+				.ConfigureLogging((hostingContext, logging) =>
 				{
-					factory.UseConfiguration(context.Configuration.GetSection("Logging"));
-					factory.AddConsole();
-					factory.AddDebug();
+					logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
+					logging.AddConsole();
+					logging.AddDebug();
 				})
 				.UseConfiguration(config)
 				.UseKestrel()
