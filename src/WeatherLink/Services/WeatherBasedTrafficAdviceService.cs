@@ -44,30 +44,30 @@ namespace WeatherLink.Services
 
 			retVal.BestTimeToLeave = forecasts.Any() ? forecasts.MinimumPrecipitation(travelTime)?.FirstOrDefault() : null;
 
-			forecasts.AddRange(forecast.Hourly.Data.Where(x => !forecasts.Any() || (x.Time > forecasts.Last().Time && x.Time > retVal.Currently.Time)));
+			forecasts.AddRange(forecast.Hourly.Data.Where(x => !forecasts.Any() || (x.DateTime > forecasts.Last().DateTime && x.DateTime > retVal.Currently.DateTime)));
 			if (!forecasts.Any()) return retVal;
 
-			retVal.NextModeratePrecipitation = forecasts.FirstOrDefault(x => x.PrecipIntensity >= ModerateThreshold && x.Time >= retVal.Currently.Time);
+			retVal.NextModeratePrecipitation = forecasts.FirstOrDefault(x => x.PrecipIntensity >= ModerateThreshold && x.DateTime >= retVal.Currently.DateTime);
 
-			retVal.NextHeavyPrecipitation = forecasts.FirstOrDefault(x => x.PrecipIntensity >= HeavyThreshold && x.Time >= retVal.Currently.Time);
+			retVal.NextHeavyPrecipitation = forecasts.FirstOrDefault(x => x.PrecipIntensity >= HeavyThreshold && x.DateTime >= retVal.Currently.DateTime);
 
 			if (retVal.Currently.PrecipIntensity > 0)
 			{
 				retVal.MinimumPrecipitation =
 					forecasts
-						.Where(x => x.Time >= retVal.Currently.Time)
+						.Where(x => x.DateTime >= retVal.Currently.DateTime)
 						.MinBy(x => x.PrecipIntensity);
 
 				retVal.NextPrecipitationAfterMinimum =
 					forecasts.FirstOrDefault(
 						x =>
-							x.Time > retVal.MinimumPrecipitation?.Time &&
+							x.DateTime > retVal.MinimumPrecipitation?.DateTime &&
 							x.PrecipIntensity > MeasurableThreshold
 							);
 			}
 			else
 			{
-				retVal.NextPrecipitation = forecasts.FirstOrDefault(x => x.PrecipIntensity > MeasurableThreshold && x.Time >= retVal.Currently.Time);
+				retVal.NextPrecipitation = forecasts.FirstOrDefault(x => x.PrecipIntensity > MeasurableThreshold && x.DateTime >= retVal.Currently.DateTime);
 			}
 
 			return retVal;
@@ -85,14 +85,14 @@ namespace WeatherLink.Services
 			if (forecasts != null)
 			{
 				forecasts.AddRange(
-					forecast?.Hourly.Data.Where(x => !forecasts.Any() || (x.Time > forecasts.Last().Time && x.Time > retVal.Currently.Time)));
+					forecast?.Hourly.Data.Where(x => !forecasts.Any() || (x.DateTime > forecasts.Last().DateTime && x.DateTime > retVal.Currently.DateTime)));
 			}
 			else
 			{
 				forecasts = forecast.Hourly.Data.ToList();
 			}
 
-			var homeDateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(retVal.Currently.Time);
+			var homeDateTimeOffset = retVal.Currently.DateTime;
 			var now = homeDateTimeOffset.UtcDateTime;
 			retVal.TargetTime = now.AddHours(hoursFromNow);
 
@@ -102,17 +102,17 @@ namespace WeatherLink.Services
 			}
 			else
 			{
-				var targetUnixSeconds = new DateTimeOffset(retVal.TargetTime.Value).ToUnixTimeSeconds();
+				var targetDateTimeOffset = new DateTimeOffset(retVal.TargetTime.Value);
 				var afterTarget = 0;
 
-				while (afterTarget < forecasts.Count && forecasts[afterTarget].Time < targetUnixSeconds)
+				while (afterTarget < forecasts.Count && forecasts[afterTarget].DateTime < targetDateTimeOffset)
 				{
 					afterTarget++;
 				}
 
 				var range = forecasts.Skip(afterTarget - 2)
 					.Take(5)
-					.Where(x => Math.Abs((DateTimeOffset.FromUnixTimeSeconds(x.Time) - retVal.TargetTime.Value).Hours) <= 1)
+					.Where(x => Math.Abs((x.DateTime - retVal.TargetTime.Value).Hours) <= 1)
 					.ToList();
 
 				if (!range.Any(x => x.PrecipIntensity > 0)) return retVal;
