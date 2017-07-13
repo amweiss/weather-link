@@ -34,7 +34,7 @@ namespace WeatherLink.Services
 		public async Task<WeatherBasedTrafficAdvice> GetTrafficAdvice(double latitude, double longitude, int travelTime)
 		{
 			var forecastResponse = await _darkSkyService.GetForecast(latitude, longitude);
-			if (forecastResponse?.Response?.Currently == null) return null;
+			if (forecastResponse?.Response?.Currently == null || forecastResponse.Response.Flags.DarkskyUnavailable != null) return null;
 			var forecast = forecastResponse.Response;
 
 			var retVal = new WeatherBasedTrafficAdvice { Currently = forecast.Currently, DataSource = forecastResponse.DataSource, AttributionLine = forecastResponse.AttributionLine };

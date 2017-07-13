@@ -215,14 +215,11 @@ namespace WeatherLink.Controllers
 				}
 			}
 
-			if (advice == null)
-			{
-				Response.StatusCode = (int)HttpStatusCode.NoContent;
-				return null;
-			}
+			var message = (advice == null)
+				? "An error occurred fetching current data."
+				: $"{advice}{Environment.NewLine}<{advice.DataSource}|{advice.AttributionLine}>";
 
-			var message = advice + Environment.NewLine + $"<{advice.DataSource}|{advice.AttributionLine}>";
-
+			Response.StatusCode = (int)HttpStatusCode.OK;
 			return new SlackResponse { response_type = "in_channel", text = Regex.Replace(message, @"\r\n?|\n", "\n") };
 		}
 	}
