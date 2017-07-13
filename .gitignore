@@ -250,6 +250,5 @@ paket-files/
 .idea/
 *.sln.iml
 
-.vscode
 .DS_Store
 /src/WeatherLink/App_Data/WeatherLink.xml
