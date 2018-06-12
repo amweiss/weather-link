@@ -8,13 +8,6 @@
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;NETCOREAPP2_0</DefineConstants>
-    <DebugSymbols></DebugSymbols>
-    <OutputPath>bin\Debug\netcoreapp2.0\</OutputPath>
-    <IntermediateOutputPath></IntermediateOutputPath>
-  </PropertyGroup>
-
   <ItemGroup>
     <Content Include="Data\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
