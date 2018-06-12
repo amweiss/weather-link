@@ -1,4 +1,4 @@
-# WeatherLink
+# Weather Link
 
 ASP.NET Core web services for weather based information.
 
