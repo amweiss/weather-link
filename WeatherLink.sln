@@ -1,11 +1,10 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26114.2
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherLink", "WeatherLink\WeatherLink.csproj", "{8C8420B6-6796-4C83-BFB2-0552B4A63DE1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherLink", "src\WeatherLink\WeatherLink.csproj", "{8C8420B6-6796-4C83-BFB2-0552B4A63DE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherLink.Tests", "WeatherLink.Tests\WeatherLink.Tests.csproj", "{A365ABAC-32F5-4910-9BED-AF807901037B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherLink.Tests", "test\WeatherLink.Tests\WeatherLink.Tests.csproj", "{A365ABAC-32F5-4910-9BED-AF807901037B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{005BF3BE-8BFD-432F-BD7F-B5EA86F4E027}"
 	ProjectSection(SolutionItems) = preProject

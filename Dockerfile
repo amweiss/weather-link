@@ -1,20 +1,20 @@
 FROM microsoft/dotnet:2.1-sdk AS build
-WORKDIR /src
+WORKDIR /
 
 # copy csproj and restore as distinct layers
 COPY *.sln .
-COPY WeatherLink/*.csproj ./WeatherLink/
-COPY WeatherLink.Tests/*.csproj ./WeatherLink.Tests/
+COPY src/WeatherLink/*.csproj ./src/WeatherLink/
+COPY test/WeatherLink.Tests/*.csproj ./test/WeatherLink.Tests/
 RUN dotnet restore
 
 # copy everything else and build app
-COPY WeatherLink/. ./WeatherLink/
-COPY WeatherLink.Tests/. ./WeatherLink.Tests/
+COPY src/WeatherLink/. ./src/WeatherLink/
 WORKDIR /src/WeatherLink
 RUN dotnet build -c Release -o app
 
 FROM build as test
-WORKDIR /src/WeatherLink.Tests
+WORKDIR /test/WeatherLinks.Tests
+COPY test/WeatherLink.Tests/. .
 RUN dotnet build -c Release -o app
 RUN dotnet test -c Release -o app
 
