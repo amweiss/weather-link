@@ -9,12 +9,14 @@ RUN dotnet restore
 
 # copy everything else and build app
 COPY WeatherLink/. ./WeatherLink/
+COPY WeatherLink.Tests/. ./WeatherLink.Tests/
 WORKDIR /src/WeatherLink
 RUN dotnet build -c Release -o app
 
 FROM build as test
 WORKDIR /src/WeatherLink.Tests
-RUN dotnet test -c Release
+RUN dotnet build -c Release -o app
+RUN dotnet test -c Release -o app
 
 FROM build as publish
 WORKDIR /src/WeatherLink
@@ -22,6 +24,5 @@ RUN dotnet publish -c Release -o app
 
 FROM microsoft/dotnet:2.1-aspnetcore-runtime AS runtime
 WORKDIR /app
-COPY --from=publish /app ./
+COPY --from=publish /src/WeatherLink/app ./
 ENTRYPOINT ["dotnet", "WeatherLink.dll"]
-
