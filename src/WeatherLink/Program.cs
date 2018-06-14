@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using System.IO;
 
 namespace WeatherLink
@@ -17,19 +15,7 @@ namespace WeatherLink
 		/// <param name="args">Command line arguments.</param>
 		public static void Main(string[] args)
 		{
-			var config = new ConfigurationBuilder()
-							.AddCommandLine(args)
-							.AddEnvironmentVariables()
-							.Build();
-
 			var host = new WebHostBuilder()
-				.ConfigureLogging((hostingContext, logging) =>
-				{
-					logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
-					logging.AddConsole();
-					logging.AddDebug();
-				})
-				.UseConfiguration(config)
 				.UseKestrel()
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.UseIISIntegration()

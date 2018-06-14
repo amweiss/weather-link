@@ -1,4 +1,4 @@
-namespace WeatherLink
+namespace WeatherLink.Models
 {
 	/// <summary>
 	/// A representation of what Slack can recieve on their webhook.

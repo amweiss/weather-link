@@ -28,8 +28,23 @@ namespace WeatherLink.Models
 		public string GoogleMapsApiKey { get; set; }
 
 		/// <summary>
-		/// The collection of tokens from Slack that are valid for this application to accept.
+		/// The base URL for the Slack API.
 		/// </summary>
-		public List<string> SlackTokens { get; set; }
+		public string SlackApiBase { get; set; }
+
+		/// <summary>
+		/// The ClientId for the Slack app.
+		/// </summary>
+		public string SlackClientId { get; set; }
+
+		/// <summary>
+		/// The Client secret for the Slack app.
+		/// </summary>
+		public string SlackClientSecret { get; set; }
+
+		/// <summary>
+		/// The connection string of the Slack token db.
+		/// </summary>
+		public string SlackTokenDbConnection { get; set; }
 	}
 }

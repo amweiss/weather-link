@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Linq;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using WeatherLink.Models;
 using WeatherLink.Services;
 
@@ -162,65 +166,6 @@ namespace WeatherLink.Controllers
 			}
 
 			return result;
-		}
-
-		/// <summary>
-		/// An endpoint for handling messages from slack.
-		/// </summary>
-		/// <param name="text">The slack message, it should match "^(?:in (\d*[.,]?\d*) hours? from )?(.+?)(?: for (.+))?$"</param>
-		/// <param name="token">The slack token to verify it's a team that is setup in WeatherLinkSettings.SlackTokens.</param>
-		/// <returns>A string value describing when to leave based on the weather.</returns>
-		[HttpPost("slack")]
-		public async Task<SlackResponse> SlackIntegration(string text, string token)
-		{
-			if (!_optionsAccessor.Value.SlackTokens.Contains(token))
-			{
-				Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-				return null;
-			}
-
-			var advice = (WeatherBasedTrafficAdvice)null;
-
-			var checkCommand = Regex.Match(text, @"^(?:in (\d*[.,]?\d*) hours? from )?(.+?)(?: for (.+))?$");
-
-			if (checkCommand.Success)
-			{
-				var hours = checkCommand.Groups?[1]?.Value;
-				var startingLocation = checkCommand.Groups?[2]?.Value;
-				var endingLocation = checkCommand.Groups?[3]?.Value;
-
-				var hasHours = double.TryParse(hours, out double hoursFromNow);
-
-				if ((hasHours && hoursFromNow < 0) || startingLocation == null)
-				{
-					Response.StatusCode = (int)HttpStatusCode.BadRequest;
-					return null;
-				}
-
-				if (string.IsNullOrWhiteSpace(endingLocation) && hasHours)
-				{
-					advice = await GetTrafficAdviceForATime(startingLocation, hoursFromNow);
-				}
-				else if (!string.IsNullOrWhiteSpace(endingLocation) && !hasHours)
-				{
-					advice = await GetTrafficAdviceToALocation(startingLocation, endingLocation);
-				}
-				else if (!string.IsNullOrWhiteSpace(endingLocation) && hasHours)
-				{
-					advice = await GetTrafficAdviceToALocationForATime(startingLocation, endingLocation, hoursFromNow);
-				}
-				else
-				{
-					advice = await GetTrafficAdvice(startingLocation);
-				}
-			}
-
-			var message = (advice == null)
-				? "An error occurred fetching current data."
-				: $"{advice}{Environment.NewLine}<{advice.DataSource}|{advice.AttributionLine}>";
-
-			Response.StatusCode = (int)HttpStatusCode.OK;
-			return new SlackResponse { response_type = "in_channel", text = Regex.Replace(message, @"\r\n?|\n", "\n") };
 		}
 	}
 }

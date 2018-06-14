@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
@@ -34,6 +35,12 @@ namespace WeatherLink
 			});
 
 			app.UseStaticFiles();
+
+			// Migrate db
+			using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+			{
+				scope.ServiceProvider.GetService<SlackWorkspaceAppContext>().Database.Migrate();
+			}
 		}
 
 		// This method gets called by the runtime. Use this method to add services to the container.
@@ -43,8 +50,16 @@ namespace WeatherLink
 			services.AddMvc();
 			services.AddOptions();
 
-			// Add custom services
+			// Get config
 			services.Configure<WeatherLinkSettings>(Configuration);
+
+			// Setup token db
+			services.AddDbContext<SlackWorkspaceAppContext>(options =>
+				options.UseSqlServer(
+					Configuration.GetValue<string>(
+						nameof(WeatherLinkSettings.SlackTokenDbConnection))));
+
+			// Add custom services
 			services.AddTransient<ITrafficAdviceService, WeatherBasedTrafficAdviceService>();
 			services.AddTransient<IGeocodeService, GoogleMapsGeocodeService>();
 			services.AddTransient<IDistanceToDurationService, GoogleMapsDistanceToDurationService>();
