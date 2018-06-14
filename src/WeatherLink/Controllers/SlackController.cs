@@ -105,7 +105,7 @@ namespace WeatherLink.Controllers
 		[HttpPost]
 		public async Task<SlackResponse> SlackIntegration(string text, string token)
 		{
-			if (!_context.WorkspaceTokens.Any(t => t.Token == token))
+			if (token != _optionsAccessor.Value.SlackVerificationToken)
 			{
 				Response.StatusCode = (int)HttpStatusCode.Unauthorized;
 				return null;

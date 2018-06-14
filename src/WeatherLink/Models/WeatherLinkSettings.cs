@@ -43,6 +43,11 @@ namespace WeatherLink.Models
 		public string SlackClientSecret { get; set; }
 
 		/// <summary>
+		/// The verification token for Slack.
+		/// </summary>
+		public string SlackVerificationToken { get; set; }
+
+		/// <summary>
 		/// The connection string of the Slack token db.
 		/// </summary>
 		public string SlackTokenDbConnection { get; set; }
