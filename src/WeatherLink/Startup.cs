@@ -32,6 +32,7 @@ namespace WeatherLink
 			app.UseSwaggerUI(c =>
 			{
 				c.SwaggerEndpoint("/swagger/v1/swagger.json", "WeatherLink V1");
+				c.RoutePrefix = "";
 			});
 
 			app.UseStaticFiles();
