@@ -12,14 +12,16 @@ namespace WeatherLink
 		/// <summary>
 		/// Entry point method.
 		/// </summary>
-		/// <param name="args">Command line arguments.</param>
-		public static void Main(string[] args)
-		{
+		/// 
+		public static void Main()
+        {
 			var host = new WebHostBuilder()
+                .UseApplicationInsights()
 				.UseKestrel()
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.UseIISIntegration()
 				.UseStartup<Startup>()
+                .UseApplicationInsights()
 				.Build();
 
 			host.Run();
