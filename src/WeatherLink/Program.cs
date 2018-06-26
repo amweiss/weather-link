@@ -1,6 +1,5 @@
-using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using System.IO;
 
 namespace WeatherLink
 {
@@ -12,19 +11,12 @@ namespace WeatherLink
 		/// <summary>
 		/// Entry point method.
 		/// </summary>
-		/// 
-		public static void Main()
-        {
-			var host = new WebHostBuilder()
+		///
+		public static void Main(string[] args) =>
+			WebHost.CreateDefaultBuilder(args)
                 .UseApplicationInsights()
-				.UseKestrel()
-				.UseContentRoot(Directory.GetCurrentDirectory())
-				.UseIISIntegration()
 				.UseStartup<Startup>()
-                .UseApplicationInsights()
-				.Build();
-
-			host.Run();
-		}
+				.Build()
+				.Run();
 	}
 }

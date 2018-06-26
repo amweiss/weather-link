@@ -74,7 +74,7 @@ namespace WeatherLink
 					Title = "WeatherLink",
 					Description = "An API to get weather based advice.",
 				});
-				c.IncludeXmlComments("App_Data/WeatherLink.xml");
+				c.IncludeXmlComments("wwwroot/WeatherLink.xml");
 				c.DescribeAllEnumsAsStrings();
 			}
 			);

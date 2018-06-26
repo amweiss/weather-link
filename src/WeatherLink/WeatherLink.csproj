@@ -3,32 +3,21 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DebugType>portable</DebugType>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <AssemblyName>WeatherLink</AssemblyName>
-    <OutputType>Exe</OutputType>
     <PackageId>WeatherLink</PackageId>
     <ApplicationInsightsResourceId>/subscriptions/629450de-4ae5-463a-8b73-da094d12e0d1/resourcegroups/weatherlink9e9c/providers/microsoft.insights/components/weather-link</ApplicationInsightsResourceId>
     <ApplicationInsightsAnnotationResourceId>/subscriptions/629450de-4ae5-463a-8b73-da094d12e0d1/resourcegroups/weatherlink9e9c/providers/microsoft.insights/components/weather-link</ApplicationInsightsAnnotationResourceId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>App_Data\WeatherLink.xml</DocumentationFile>
+    <DocumentationFile>wwwroot\WeatherLink.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>App_Data\WeatherLink.xml</DocumentationFile>
+    <DocumentationFile>wwwroot\WeatherLink.xml</DocumentationFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Content Include="App_Data\WeatherLink.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="robots933456.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Properties\" />
@@ -36,6 +25,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.1" />
     <PackageReference Include="morelinq" Version="2.10.0" />

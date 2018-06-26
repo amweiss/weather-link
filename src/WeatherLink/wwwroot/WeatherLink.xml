@@ -1,0 +1,410 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WeatherLink</name>
+    </assembly>
+    <members>
+        <member name="T:WeatherLink.Controllers.SlackController">
+            <summary>
+            Interact with the traffic advice service from Slack.
+            </summary>
+        </member>
+        <member name="M:WeatherLink.Controllers.SlackController.#ctor(Microsoft.Extensions.Options.IOptions{WeatherLink.Models.WeatherLinkSettings},WeatherLink.Services.ITrafficAdviceService,WeatherLink.Services.IGeocodeService,WeatherLink.Services.IDistanceToDurationService,WeatherLink.Models.SlackWorkspaceAppContext)">
+            <summary>
+            Interact with the traffic advice service from Slack.
+            </summary>
+        </member>
+        <member name="M:WeatherLink.Controllers.SlackController.Install">
+            <summary>
+            An endpoint for installing the app in Slack.
+            </summary>
+        </member>
+        <member name="M:WeatherLink.Controllers.SlackController.Authorize(System.String)">
+            <summary>
+            An endpoint for authorizing use in Slack.
+            </summary>
+        </member>
+        <member name="M:WeatherLink.Controllers.SlackController.SlackIntegration(System.String,System.String)">
+            <summary>
+            An endpoint for handling messages from slack.
+            </summary>
+            <param name="text">The slack message, it should match "^(?:in (\d*[.,]?\d*) hours? from )?(.+?)(?: for (.+))?$"</param>
+            <param name="token">The slack token to verify it's a team that is setup in WeatherLinkSettings.SlackTokens.</param>
+            <returns>A string value describing when to leave based on the weather.</returns>
+        </member>
+        <member name="T:WeatherLink.Controllers.TrafficAdviceController">
+            <summary>
+            Provide traffic advice.
+            </summary>
+        </member>
+        <member name="M:WeatherLink.Controllers.TrafficAdviceController.#ctor(Microsoft.Extensions.Options.IOptions{WeatherLink.Models.WeatherLinkSettings},WeatherLink.Services.ITrafficAdviceService,WeatherLink.Services.IGeocodeService,WeatherLink.Services.IDistanceToDurationService)">
+            <summary>
+            Access traffic advice via a web API.
+            </summary>
+        </member>
+        <member name="M:WeatherLink.Controllers.TrafficAdviceController.GetTrafficAdvice(System.Double,System.Double)">
+            <summary>
+            Get traffic advice based on a latitude and longitude.
+            </summary>
+            <param name="latitude">Latitude in degrees.</param>
+            <param name="longitude">Longitude in degrees.</param>
+            <returns>A string value describing when to leave based on the weather.</returns>
+        </member>
+        <member name="M:WeatherLink.Controllers.TrafficAdviceController.GetTrafficAdvice(System.String)">
+            <summary>
+            Get traffic advice for a geocoded location.
+            </summary>
+            <param name="location">The string to translate into latitude and longitude.</param>
+            <returns>A string value describing when to leave based on the weather.</returns>
+        </member>
+        <member name="M:WeatherLink.Controllers.TrafficAdviceController.GetTrafficAdviceForATime(System.String,System.Double)">
+            <summary>
+            Get traffic advice for a geocoded location at a specific time.
+            </summary>
+            <param name="location">The string to translate into latitude and longitude.</param>
+            <param name="time">The time in hours from now as decimal representation.</param>
+            <returns>A string value describing when to leave based on the weather.</returns>
+        </member>
+        <member name="M:WeatherLink.Controllers.TrafficAdviceController.GetTrafficAdviceToALocation(System.String,System.String)">
+            <summary>
+            Get traffic advice for a geocoded location to another geolocation. The destination is only used for travel duration currently.
+            </summary>
+            <param name="startingLocation">The starting location string to translate into latitude and longitude.</param>
+            <param name="endingLocation">The ending location string to translate into latitude and longitude.</param>
+            <returns>A string value describing when to leave based on the weather.</returns>
+        </member>
+        <member name="M:WeatherLink.Controllers.TrafficAdviceController.GetTrafficAdviceToALocationForATime(System.String,System.String,System.Double)">
+            <summary>
+            Get traffic advice for a geocoded location to another geolocation at a specific time. The destination is only used for travel duration currently.
+            </summary>
+            <param name="startingLocation">The starting location string to translate into latitude and longitude.</param>
+            <param name="endingLocation">The ending location string to translate into latitude and longitude.</param>
+            <param name="time">The time in hours from now as decimal representation.</param>
+            <returns>A string value describing when to leave based on the weather.</returns>
+        </member>
+        <member name="T:WeatherLink.Models.SlackResponse">
+            <summary>
+            A representation of what Slack can recieve on their webhook.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.SlackResponse.response_type">
+            <summary>
+            The type of the response that will be posted.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.SlackResponse.text">
+            <summary>
+            The body of the response.
+            </summary>
+        </member>
+        <member name="T:WeatherLink.Models.SlackWorkspaceAppContext">
+            <summary>
+            Model for Slack tokens to keep that allow access.
+            </summary>
+        </member>
+        <member name="M:WeatherLink.Models.SlackWorkspaceAppContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions{WeatherLink.Models.SlackWorkspaceAppContext})">
+            <summary>
+            Constructor that takes options.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.SlackWorkspaceAppContext.WorkspaceTokens">
+            <summary>
+            The tokens from Slack.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:WeatherLink.Models.WeatherBasedTrafficAdvice">
+            <summary>
+            A collection of data that provides advice based on weather data.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherBasedTrafficAdvice.AttributionLine">
+            <summary>
+            Text to show where the data comes from.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherBasedTrafficAdvice.BestTimeToLeave">
+            <summary>
+            The point in time that would be the best to leave based on the weather.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherBasedTrafficAdvice.Currently">
+            <summary>
+            The point in time and precipitation for the time closest to the current time.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherBasedTrafficAdvice.DataSource">
+            <summary>
+            The data source.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherBasedTrafficAdvice.MinimumPrecipitation">
+            <summary>
+            The point in time with the minimum precipitation.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherBasedTrafficAdvice.NextHeavyPrecipitation">
+            <summary>
+            The next point in time for heavy precipitation.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherBasedTrafficAdvice.NextModeratePrecipitation">
+            <summary>
+            The next point in time for moderate precipitation.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherBasedTrafficAdvice.NextPrecipitation">
+            <summary>
+            The point in time with the next measurable precipitation.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherBasedTrafficAdvice.NextPrecipitationAfterMinimum">
+            <summary>
+            The next point in time that has measurable precipitation after the next minimum level of precipitation.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherBasedTrafficAdvice.TargetTime">
+            <summary>
+            The desired time to get adivce for.
+            </summary>
+        </member>
+        <member name="M:WeatherLink.Models.WeatherBasedTrafficAdvice.ToString">
+            <summary>
+            Convert the advice to a human readable string.
+            </summary>
+            <returns>Traffic advice in text format.</returns>
+        </member>
+        <member name="T:WeatherLink.Models.WeatherLinkSettings">
+            <summary>
+            Container for the application settings.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherLinkSettings.DarkSkyApiBase">
+            <summary>
+            The base URL for the Dark Sky API.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherLinkSettings.DarkSkyApiKey">
+            <summary>
+            The API key for use with the DarkSky API.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherLinkSettings.GoogleMapsApiBase">
+            <summary>
+            The base URL for the Google Maps API.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherLinkSettings.GoogleMapsApiKey">
+            <summary>
+            The API key for use with the Google Maps API.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherLinkSettings.SlackApiBase">
+            <summary>
+            The base URL for the Slack API.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherLinkSettings.SlackClientId">
+            <summary>
+            The ClientId for the Slack app.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherLinkSettings.SlackClientSecret">
+            <summary>
+            The Client secret for the Slack app.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherLinkSettings.SlackVerificationToken">
+            <summary>
+            The verification token for Slack.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherLinkSettings.SlackTokenDbConnection">
+            <summary>
+            The connection string of the Slack token db.
+            </summary>
+        </member>
+        <member name="T:WeatherLink.Models.WorkspaceToken">
+            <summary>
+            The token object from Slack.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WorkspaceToken.Id">
+            <summary>
+            A GUID to track the entries.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WorkspaceToken.Token">
+            <summary>
+            The token to use to verify the instance.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WorkspaceToken.AppId">
+            <summary>
+            The AppId making the request.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WorkspaceToken.TeamId">
+            <summary>
+            The team the app is installed to.
+            </summary>
+        </member>
+        <member name="T:WeatherLink.Program">
+            <summary>
+            Entry point class.
+            </summary>
+        </member>
+        <member name="M:WeatherLink.Program.Main(System.String[])">
+             <summary>
+             Entry point method.
+             </summary>
+            
+        </member>
+        <member name="T:WeatherLink.Services.GoogleMapsDistanceToDurationService">
+            <summary>
+            A service for providing travel duration based on the Google Maps Distance Matrix API.
+            </summary>
+        </member>
+        <member name="M:WeatherLink.Services.GoogleMapsDistanceToDurationService.#ctor(Microsoft.Extensions.Options.IOptions{WeatherLink.Models.WeatherLinkSettings})">
+            <summary>
+            Create a new Google Maps Distance to Duration service based on optionsAccessor.
+            </summary>
+            <param name="optionsAccessor">The options to use for the service.</param>
+        </member>
+        <member name="M:WeatherLink.Services.GoogleMapsDistanceToDurationService.TimeInMinutesBetweenLocations(System.String,System.String)">
+            <summary>
+            Find the travel time in minutes between two geocoded list.
+            </summary>
+            <param name="startingLocation">The starting location string to attempt to convert into a latitude and longitude.</param>
+            <param name="endingLocation">The ending location string to attempt to convert into a latitude and longitude.</param>
+            <returns>The duration of travel by car in minutes based on the Google Maps Distance Matrix API.</returns>
+        </member>
+        <member name="T:WeatherLink.Services.GoogleMapsGeocodeService">
+            <summary>
+            Provides a geocoding service based on the Google Maps API.
+            </summary>
+        </member>
+        <member name="M:WeatherLink.Services.GoogleMapsGeocodeService.#ctor(Microsoft.Extensions.Options.IOptions{WeatherLink.Models.WeatherLinkSettings})">
+            <summary>
+            Create a new Google Maps Geocode service based on optionsAccessor.
+            </summary>
+            <param name="optionsAccessor">The options to use for the service.</param>
+        </member>
+        <member name="M:WeatherLink.Services.GoogleMapsGeocodeService.Geocode(System.String)">
+            <summary>
+            Transform an address into a latitude and longitude.
+            </summary>
+            <param name="address">The location to turn into a latitude and longitude.</param>
+            <returns>The Tuple of (latitude, longitude).</returns>
+        </member>
+        <member name="T:WeatherLink.Services.HourlyAndMinutelyDarkSkyService">
+            <summary>
+            A service to get a Dark Sky forecast for a latitude and longitude.
+            </summary>
+        </member>
+        <member name="M:WeatherLink.Services.HourlyAndMinutelyDarkSkyService.#ctor(Microsoft.Extensions.Options.IOptions{WeatherLink.Models.WeatherLinkSettings})">
+            <summary>
+            An implementation of IDarkSkyService that exlcudes daily data, alert data, and flags data.
+            </summary>
+            <param name="optionsAccessor"></param>
+        </member>
+        <member name="M:WeatherLink.Services.HourlyAndMinutelyDarkSkyService.GetForecast(System.Double,System.Double)">
+            <summary>
+            Make a request to get forecast data.
+            </summary>
+            <param name="latitude">Latitude to request data for in decimal degrees.</param>
+            <param name="longitude">Longitude to request data for in decimal degrees.</param>
+            <returns>A DarkSkyResponse with the API headers and data.</returns>
+        </member>
+        <member name="T:WeatherLink.Services.IDarkSkyService">
+            <summary>
+            A service to get a Dark Sky forecast for a latitude and longitude.
+            </summary>
+        </member>
+        <member name="M:WeatherLink.Services.IDarkSkyService.GetForecast(System.Double,System.Double)">
+            <summary>
+            Make a request to get forecast data.
+            </summary>
+            <param name="latitude">Latitude to request data for in decimal degrees.</param>
+            <param name="longitude">Longitude to request data for in decimal degrees.</param>
+            <returns>A DarkSkyResponse with the API headers and data.</returns>
+        </member>
+        <member name="T:WeatherLink.Services.IDistanceToDurationService">
+            <summary>
+            A service for providing travel duration based on distances.
+            </summary>
+        </member>
+        <member name="M:WeatherLink.Services.IDistanceToDurationService.TimeInMinutesBetweenLocations(System.String,System.String)">
+            <summary>
+            Find the travel time in minutes between two geocoded list.
+            </summary>
+            <param name="startingLocation">The starting location string to attempt to convert into a latitude and longitude.</param>
+            <param name="endingLocation">The ending location string to attempt to convert into a latitude and longitude.</param>
+            <returns>The duration of travel in minutes.</returns>
+        </member>
+        <member name="T:WeatherLink.Services.IGeocodeService">
+            <summary>
+            A service to convert an address to a latitude and longitude.
+            </summary>
+        </member>
+        <member name="M:WeatherLink.Services.IGeocodeService.Geocode(System.String)">
+            <summary>
+            Convert address to a latitude and longitude Tuple.
+            </summary>
+            <param name="address">The string to attempt to convert into a latitude and longitude.</param>
+            <returns>The Tuple of latitude and longitude in degrees.</returns>
+        </member>
+        <member name="T:WeatherLink.Services.ITrafficAdviceService">
+            <summary>
+            A service to get traffic advice.
+            </summary>
+        </member>
+        <member name="M:WeatherLink.Services.ITrafficAdviceService.GetTrafficAdvice(System.Double,System.Double,System.Int32)">
+            <summary>
+            Get traffic advice for a given location.
+            </summary>
+            <param name="latitude">The latitude in degrees.</param>
+            <param name="longitude">The longitude in degrees.</param>
+            <param name="travelTime">The duration of the trip normally in minutes.</param>
+            <returns>A string of traffic advice</returns>
+        </member>
+        <member name="M:WeatherLink.Services.ITrafficAdviceService.GetTrafficAdviceForATime(System.Double,System.Double,System.Double,System.Int32)">
+            <summary>
+            Get traffic advice for a given time and location.
+            </summary>
+            <param name="latitude">The latitude in degrees.</param>
+            <param name="longitude">The longitude in degrees.</param>
+            <param name="hoursFromNow">The hours from the current time to get traffice advice for.</param>
+            <param name="travelTime">The duration of the trip normally in minutes.</param>
+            <returns>A string of traffic advice.</returns>
+        </member>
+        <member name="F:WeatherLink.Services.WeatherBasedTrafficAdviceService.HeavyThreshold">
+            <summary>
+            The threshold where percipitation is deemed heavy.
+            </summary>
+        </member>
+        <member name="F:WeatherLink.Services.WeatherBasedTrafficAdviceService.MeasurableThreshold">
+            <summary>
+            The threshold where percipitation is deemed measurable.
+            </summary>
+        </member>
+        <member name="F:WeatherLink.Services.WeatherBasedTrafficAdviceService.ModerateThreshold">
+            <summary>
+            The threshold where percipitation is deemed moderate.
+            </summary>
+        </member>
+        <member name="T:DarkSky.Models.DataPointListExtensions">
+            <summary>
+            Extensions for an IEnumerable of DataPoints
+            </summary>
+        </member>
+        <member name="M:DarkSky.Models.DataPointListExtensions.MinimumPrecipitation(System.Collections.Generic.List{DarkSky.Models.DataPoint},System.Int32)">
+            <summary>
+            Finds the IEnumerable containing the DataPoints for the period of numberOfMinutes that contains the minimum amount of precipitation.
+            </summary>
+            <param name="forecasts">The IEnumerable of DataPoints to act upon.</param>
+            <param name="numberOfMinutes">The period of minutes desired to contain the minimum amount of precipitation.</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
