@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using WeatherLink.Models;
-using static MoreLinq.MoreEnumerable;
+using MoreLinq;
 
 namespace WeatherLink.Services
 {
@@ -56,7 +56,8 @@ namespace WeatherLink.Services
 				retVal.MinimumPrecipitation =
 					forecasts
 						.Where(x => x.DateTime >= retVal.Currently.DateTime)
-						.MinBy(x => x.PrecipIntensity);
+						.MinBy(x => x.PrecipIntensity)
+						.First();
 
 				retVal.NextPrecipitationAfterMinimum =
 					forecasts.FirstOrDefault(
@@ -117,7 +118,7 @@ namespace WeatherLink.Services
 
 				if (!range.Any(x => x.PrecipIntensity > 0)) return retVal;
 
-				retVal.BestTimeToLeave = range.MinBy(x => x.PrecipIntensity);
+				retVal.BestTimeToLeave = range.MinBy(x => x.PrecipIntensity).First();
 			}
 
 			return retVal;
