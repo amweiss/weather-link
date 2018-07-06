@@ -43,7 +43,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.1.1" />
     <PackageReference Include="Humanizer.Core" Version="2.4.2" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="2.5.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
     <PackageReference Include="DarkSkyCore" Version="4.0.1" />
   </ItemGroup>
 
