@@ -130,21 +130,28 @@ namespace WeatherLink.Controllers
 					return null;
 				}
 
-				if (string.IsNullOrWhiteSpace(endingLocation) && hasHours)
+				try
 				{
-					advice = await _adviceController.GetTrafficAdviceForATime(startingLocation, hoursFromNow);
+					if (string.IsNullOrWhiteSpace(endingLocation) && hasHours)
+					{
+						advice = await _adviceController.GetTrafficAdviceForATime(startingLocation, hoursFromNow);
+					}
+					else if (!string.IsNullOrWhiteSpace(endingLocation) && !hasHours)
+					{
+						advice = await _adviceController.GetTrafficAdviceToALocation(startingLocation, endingLocation);
+					}
+					else if (!string.IsNullOrWhiteSpace(endingLocation) && hasHours)
+					{
+						advice = await _adviceController.GetTrafficAdviceToALocationForATime(startingLocation, endingLocation, hoursFromNow);
+					}
+					else
+					{
+						advice = await _adviceController.GetTrafficAdvice(startingLocation);
+					}
 				}
-				else if (!string.IsNullOrWhiteSpace(endingLocation) && !hasHours)
+				catch (System.Exception)
 				{
-					advice = await _adviceController.GetTrafficAdviceToALocation(startingLocation, endingLocation);
-				}
-				else if (!string.IsNullOrWhiteSpace(endingLocation) && hasHours)
-				{
-					advice = await _adviceController.GetTrafficAdviceToALocationForATime(startingLocation, endingLocation, hoursFromNow);
-				}
-				else
-				{
-					advice = await _adviceController.GetTrafficAdvice(startingLocation);
+					advice = null;
 				}
 			}
 

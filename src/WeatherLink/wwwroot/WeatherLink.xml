@@ -102,10 +102,16 @@
             Model for Slack tokens to keep that allow access.
             </summary>
         </member>
-        <member name="M:WeatherLink.Models.SlackWorkspaceAppContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions{WeatherLink.Models.SlackWorkspaceAppContext})">
+        <member name="M:WeatherLink.Models.SlackWorkspaceAppContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions{WeatherLink.Models.SlackWorkspaceAppContext},Microsoft.Extensions.Options.IOptions{WeatherLink.Models.WeatherLinkSettings})">
             <summary>
             Constructor that takes options.
             </summary>
+        </member>
+        <member name="M:WeatherLink.Models.SlackWorkspaceAppContext.OnConfiguring(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder)">
+            <summary>
+            Setup the context.
+            </summary>
+            <param name="optionsBuilder">Context option builder</param>
         </member>
         <member name="P:WeatherLink.Models.SlackWorkspaceAppContext.WorkspaceTokens">
             <summary>
@@ -265,10 +271,17 @@
             </summary>
         </member>
         <member name="M:WeatherLink.Program.Main(System.String[])">
-             <summary>
-             Entry point method.
-             </summary>
-            
+            <summary>
+            Program Entry point
+            </summary>
+            <param name="args">Program args</param>
+        </member>
+        <member name="M:WeatherLink.Program.CreateWebHostBuilder(System.String[])">
+            <summary>
+            Setup web hosting
+            </summary>
+            <param name="args">WebHost args</param>
+            <returns>WebHost builder</returns>
         </member>
         <member name="T:WeatherLink.Services.GoogleMapsDistanceToDurationService">
             <summary>
