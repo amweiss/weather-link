@@ -56,9 +56,11 @@ namespace WeatherLink
 
 			// Setup token db
 			services.AddDbContext<SlackWorkspaceAppContext>(options =>
-				options.UseSqlServer(
-					Configuration.GetValue<string>(
-						nameof(WeatherLinkSettings.SlackTokenDbConnection))));
+				options.UseCosmosSql(
+					Configuration.GetValue<string>(nameof(WeatherLinkSettings.SlackTokenDbServiceEndpoint)),
+					Configuration.GetValue<string>(nameof(WeatherLinkSettings.SlackTokenDbAuthKey)),
+					Configuration.GetValue<string>(nameof(WeatherLinkSettings.SlackTokenDbDatabaseName))
+					));
 
 			// Add custom services
 			services.AddTransient<ITrafficAdviceService, WeatherBasedTrafficAdviceService>();

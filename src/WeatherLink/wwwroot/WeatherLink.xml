@@ -219,7 +219,17 @@
             The verification token for Slack.
             </summary>
         </member>
-        <member name="P:WeatherLink.Models.WeatherLinkSettings.SlackTokenDbConnection">
+        <member name="P:WeatherLink.Models.WeatherLinkSettings.SlackTokenDbAuthKey">
+            <summary>
+            The connection string of the Slack token db.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherLinkSettings.SlackTokenDbDatabaseName">
+            <summary>
+            The connection string of the Slack token db.
+            </summary>
+        </member>
+        <member name="P:WeatherLink.Models.WeatherLinkSettings.SlackTokenDbServiceEndpoint">
             <summary>
             The connection string of the Slack token db.
             </summary>

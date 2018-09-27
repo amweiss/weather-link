@@ -50,6 +50,16 @@ namespace WeatherLink.Models
 		/// <summary>
 		/// The connection string of the Slack token db.
 		/// </summary>
-		public string SlackTokenDbConnection { get; set; }
+		public string SlackTokenDbAuthKey { get; set; }
+
+		/// <summary>
+		/// The connection string of the Slack token db.
+		/// </summary>
+		public string SlackTokenDbDatabaseName { get; set; }
+
+		/// <summary>
+		/// The connection string of the Slack token db.
+		/// </summary>
+		public string SlackTokenDbServiceEndpoint { get; set; }
 	}
 }
