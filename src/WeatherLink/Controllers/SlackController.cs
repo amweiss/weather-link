@@ -80,6 +80,7 @@ namespace WeatherLink.Controllers
 			var resultJsonString = await result.Content.ReadAsStringAsync();
 			var workspaceTokenResponse = JsonConvert.DeserializeObject<dynamic>(resultJsonString);
 
+			await _context.Database.EnsureCreatedAsync();
 			_context.WorkspaceTokens.Add(new WorkspaceToken
 			{
 				Id = new Guid(),
@@ -87,7 +88,7 @@ namespace WeatherLink.Controllers
 				TeamId = workspaceTokenResponse.team_id,
 				Token = workspaceTokenResponse.access_token
 			});
-			_context.SaveChanges();
+			await _context.SaveChangesAsync();
 
 			return new ContentResult
 			{

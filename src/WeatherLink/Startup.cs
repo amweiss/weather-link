@@ -36,12 +36,6 @@ namespace WeatherLink
 			});
 
 			app.UseStaticFiles();
-
-			// Migrate db
-			using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
-			{
-				scope.ServiceProvider.GetService<SlackWorkspaceAppContext>().Database.Migrate();
-			}
 		}
 
 		// This method gets called by the runtime. Use this method to add services to the container.
@@ -55,10 +49,7 @@ namespace WeatherLink
 			services.Configure<WeatherLinkSettings>(Configuration);
 
 			// Setup token db
-			services.AddDbContext<SlackWorkspaceAppContext>(options =>
-				options.UseSqlServer(
-					Configuration.GetValue<string>(
-						nameof(WeatherLinkSettings.SlackTokenDbConnection))));
+			services.AddDbContext<SlackWorkspaceAppContext>();
 
 			// Add custom services
 			services.AddTransient<ITrafficAdviceService, WeatherBasedTrafficAdviceService>();
