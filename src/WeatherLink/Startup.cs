@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Swashbuckle.AspNetCore.Swagger;
+using NSwag.AspNetCore;
 using WeatherLink.Models;
 using WeatherLink.Services;
 
@@ -24,15 +25,26 @@ namespace WeatherLink
 		public IConfigurationRoot Configuration { get; }
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app)
+		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 		{
+			if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseHsts();
+            }
+
+            app.UseHttpsRedirection();
 			app.UseMvc();
 
-			app.UseSwagger();
-			app.UseSwaggerUI(c =>
+			app.UseSwaggerUi3WithApiExplorer(c =>
 			{
-				c.SwaggerEndpoint("/swagger/v1/swagger.json", "WeatherLink V1");
-				c.RoutePrefix = "";
+				c.SwaggerRoute = "/swagger/v1/swagger.json";
+                c.SwaggerUiRoute = "/swagger";
+				c.GeneratorSettings.Title = "WeatherLink";
+				c.GeneratorSettings.Description = "An API to get weather based advice.";
 			});
 
 			app.UseStaticFiles();
@@ -42,7 +54,7 @@ namespace WeatherLink
 		public void ConfigureServices(IServiceCollection services)
 		{
 			// Add framework services
-			services.AddMvc();
+			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 			services.AddOptions();
 
 			// Get config
@@ -58,17 +70,7 @@ namespace WeatherLink
 			services.AddTransient<IDarkSkyService, HourlyAndMinutelyDarkSkyService>();
 
 			// Configure swagger
-			services.AddSwaggerGen(c =>
-			{
-				c.SwaggerDoc("v1", new Info
-				{
-					Title = "WeatherLink",
-					Description = "An API to get weather based advice.",
-				});
-				c.IncludeXmlComments("wwwroot/WeatherLink.xml");
-				c.DescribeAllEnumsAsStrings();
-			}
-			);
+			services.AddSwagger();
 		}
 	}
 }
