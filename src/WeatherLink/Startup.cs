@@ -39,13 +39,8 @@ namespace WeatherLink
             app.UseHttpsRedirection();
 			app.UseMvc();
 
-			app.UseSwaggerUi3WithApiExplorer(c =>
-			{
-				c.SwaggerRoute = "/swagger/v1/swagger.json";
-                c.SwaggerUiRoute = "/swagger";
-				c.GeneratorSettings.Title = "WeatherLink";
-				c.GeneratorSettings.Description = "An API to get weather based advice.";
-			});
+			app.UseSwagger();
+			app.UseSwaggerUi3();
 
 			app.UseStaticFiles();
 		}
@@ -70,7 +65,11 @@ namespace WeatherLink
 			services.AddTransient<IDarkSkyService, HourlyAndMinutelyDarkSkyService>();
 
 			// Configure swagger
-			services.AddSwagger();
+			services.AddSwaggerDocument(c =>
+			{
+				c.Title = "WeatherLink";
+				c.Description = "An API to get weather based advice.";
+			});
 		}
 	}
 }
