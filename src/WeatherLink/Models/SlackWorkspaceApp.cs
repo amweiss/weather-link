@@ -27,7 +27,7 @@ namespace WeatherLink.Models
 		/// <param name="optionsBuilder">Context option builder</param>
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
-			optionsBuilder.UseCosmosSql(
+			optionsBuilder.UseCosmos(
 				_optionsAccessor.Value.SlackTokenDbServiceEndpoint,
 				_optionsAccessor.Value.SlackTokenDbAuthKey,
 				_optionsAccessor.Value.SlackTokenDbDatabaseName
