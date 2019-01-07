@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NSwag.AspNetCore;
 using WeatherLink.Models;
 using WeatherLink.Services;
+using NSwag;
 
 namespace WeatherLink
 {
@@ -69,6 +70,7 @@ namespace WeatherLink
 			{
 				c.Title = "WeatherLink";
 				c.Description = "An API to get weather based advice.";
+				c.PostProcess = (document) => document.Schemes = new[] { SwaggerSchema.Https };
 			});
 		}
 	}
