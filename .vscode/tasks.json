@@ -5,7 +5,7 @@
 	"tasks": [
 		{
 			"label": "build",
-			"command": "dotnet",
+			"command": "dotnet.exe",
 			"args": [
 				"build"
 			],
