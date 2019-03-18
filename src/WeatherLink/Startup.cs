@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using NSwag.AspNetCore;
 using WeatherLink.Models;
 using WeatherLink.Services;
@@ -13,7 +14,7 @@ namespace WeatherLink
 {
 	internal class Startup
 	{
-		public Startup(IHostingEnvironment env)
+		public Startup(IWebHostEnvironment env)
 		{
 			var builder = new ConfigurationBuilder()
 				.SetBasePath(env.ContentRootPath)
@@ -26,7 +27,7 @@ namespace WeatherLink
 		public IConfigurationRoot Configuration { get; }
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
 			if (env.IsDevelopment())
             {
@@ -50,7 +51,7 @@ namespace WeatherLink
 		public void ConfigureServices(IServiceCollection services)
 		{
 			// Add framework services
-			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+			services.AddMvc();
 			services.AddOptions();
 
 			// Get config
