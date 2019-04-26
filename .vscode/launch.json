@@ -6,7 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceRoot}/src/WeatherLink/bin/Debug/netcoreapp2.2/WeatherLink.dll",
+            "program": "${workspaceRoot}/src/WeatherLink/bin/Debug/netcoreapp3.0/WeatherLink.dll",
             "args": [],
             "cwd": "${workspaceRoot}/src/WeatherLink/",
             "stopAtEntry": false,
