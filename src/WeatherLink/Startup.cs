@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NSwag.AspNetCore;
 using WeatherLink.Models;
 using WeatherLink.Services;
@@ -30,28 +32,36 @@ namespace WeatherLink
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
 			if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseHsts();
-            }
+			{
+				app.UseDeveloperExceptionPage();
+			}
+			else
+			{
+				app.UseHttpsRedirection();
+				app.UseExceptionHandler("/Error");
+				app.UseHsts();
+			}
 
-            app.UseHttpsRedirection();
-			app.UseMvc();
+			app.UseStaticFiles();
+
+			app.UseRouting();
+
+			app.UseEndpoints(endpoints =>
+			{
+				endpoints.MapControllers();
+				endpoints.MapHealthChecks("/health");
+			});
 
 			app.UseSwagger();
 			app.UseSwaggerUi3();
-
-			app.UseStaticFiles();
 		}
 
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
 			// Add framework services
-			services.AddMvc();
+			services.AddMvc().AddNewtonsoftJson(); //TODO: Change this to AddControllers when possible
+			services.AddHealthChecks();
 			services.AddOptions();
 
 			// Get config
