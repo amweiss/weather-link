@@ -37,7 +37,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.0.0-preview6.19226.1" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.0.0-preview6.19226.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="3.0.0-preview4-19123-01" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0-preview4-19216-03" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0-preview5-19227-01" />
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="3.0.0-preview4-19123-01" />
     <PackageReference Include="Humanizer.Core" Version="2.6.2" />
     <PackageReference Include="DarkSkyCore" Version="5.1.15" />
