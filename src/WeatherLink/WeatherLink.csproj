@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.7.0-beta3" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.7.0-beta4" />
     <PackageReference Include="Microsoft.AspNetCore" Version="3.0.0-preview4-19123-01" />
     <PackageReference Include="Microsoft.AspNetCore.HttpsPolicy" Version="3.0.0-preview4-19123-01" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Cosmos" Version="3.0.0-preview6.19224.6" />
