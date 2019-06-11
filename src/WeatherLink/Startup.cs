@@ -52,7 +52,7 @@ namespace WeatherLink
 				endpoints.MapHealthChecks("/health");
 			});
 
-			app.UseSwagger();
+			app.UseOpenApi();
 			app.UseSwaggerUi3();
 		}
 
