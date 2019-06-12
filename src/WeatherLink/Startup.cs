@@ -52,7 +52,7 @@ namespace WeatherLink
 				endpoints.MapHealthChecks("/health");
 			});
 
-			app.UseSwagger();
+			app.UseOpenApi();
 			app.UseSwaggerUi3();
 		}
 
@@ -77,11 +77,11 @@ namespace WeatherLink
 			services.AddTransient<IDarkSkyService, HourlyAndMinutelyDarkSkyService>();
 
 			// Configure swagger
-			services.AddSwaggerDocument(c =>
+			services.AddOpenApiDocument(c =>
 			{
 				c.Title = "WeatherLink";
 				c.Description = "An API to get weather based advice.";
-				c.PostProcess = (document) => document.Schemes = new[] { SwaggerSchema.Https };
+				c.PostProcess = (document) => document.Schemes = new[] { OpenApiSchema.Https };
 			});
 		}
 	}
