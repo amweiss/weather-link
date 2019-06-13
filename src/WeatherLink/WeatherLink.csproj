@@ -41,7 +41,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="3.0.0-preview4-19123-01" />
     <PackageReference Include="Humanizer.Core" Version="2.6.2" />
     <PackageReference Include="DarkSkyCore" Version="5.1.15" />
-    <PackageReference Include="NSwag.AspNetCore" Version="13.0.0" />
+    <PackageReference Include="NSwag.AspNetCore" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>
