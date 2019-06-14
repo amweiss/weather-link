@@ -1,12 +1,18 @@
-﻿using DarkSky.Models;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using WeatherLink.Models;
-using MoreLinq;
+﻿// Copyright (c) Adam Weiss. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace WeatherLink.Services
 {
+	using System;
+	using System.Linq;
+	using System.Threading.Tasks;
+	using DarkSky.Models;
+	using MoreLinq;
+	using WeatherLink.Models;
+
+	/// <summary>
+	/// Service to provide advice based on traffic and weather.
+	/// </summary>
 	internal class WeatherBasedTrafficAdviceService : ITrafficAdviceService
 	{
 		/// <summary>
@@ -23,32 +29,44 @@ namespace WeatherLink.Services
 		/// The threshold where percipitation is deemed moderate.
 		/// </summary>
 		public const double ModerateThreshold = 0.1;
+		private const string Message = "DarkSky API currently unavailable.";
+		private readonly IDarkSkyService darkSkyService;
 
-		private readonly IDarkSkyService _darkSkyService;
-
+		/// <summary>
+		/// Initializes a new instance of the <see cref="WeatherBasedTrafficAdviceService"/> class.
+		/// </summary>
+		/// <param name="darkSkyService">Service for weather based information.</param>
 		public WeatherBasedTrafficAdviceService(IDarkSkyService darkSkyService)
 		{
-			_darkSkyService = darkSkyService;
+			this.darkSkyService = darkSkyService;
 		}
 
+		/// <inheritdoc/>
 		public async Task<WeatherBasedTrafficAdvice> GetTrafficAdvice(double latitude, double longitude, int travelTime)
 		{
-			var forecastResponse = await _darkSkyService.GetForecast(latitude, longitude);
+			var forecastResponse = await darkSkyService.GetForecast(latitude, longitude);
 			if (forecastResponse?.Response?.Currently == null || forecastResponse.Response.Flags.DarkskyUnavailable != null)
 			{
-				throw new NullReferenceException("DarkSky API currently unavailable.");
+				throw new NullReferenceException(Message);
 			}
+
 			var forecast = forecastResponse.Response;
 
 			var retVal = new WeatherBasedTrafficAdvice { Currently = forecast.Currently, DataSource = forecastResponse.DataSource, AttributionLine = forecastResponse.AttributionLine };
 			var forecasts = forecast.Minutely?.Data?.ToList();
 
-			if (retVal.Currently == null || forecasts == null) return retVal;
+			if (retVal.Currently == null || forecasts == null)
+			{
+				return retVal;
+			}
 
 			retVal.BestTimeToLeave = forecasts.Any() ? forecasts.MinimumPrecipitation(travelTime)?.FirstOrDefault() : null;
 
 			forecasts.AddRange(forecast.Hourly.Data.Where(x => !forecasts.Any() || (x.DateTime > forecasts.Last().DateTime && x.DateTime > retVal.Currently.DateTime)));
-			if (!forecasts.Any()) return retVal;
+			if (!forecasts.Any())
+			{
+				return retVal;
+			}
 
 			retVal.NextModeratePrecipitation = forecasts.FirstOrDefault(x => x.PrecipIntensity >= ModerateThreshold && x.DateTime >= retVal.Currently.DateTime);
 
@@ -66,8 +84,7 @@ namespace WeatherLink.Services
 					forecasts.FirstOrDefault(
 						x =>
 							x.DateTime > retVal.MinimumPrecipitation?.DateTime &&
-							x.PrecipIntensity > MeasurableThreshold
-							);
+							x.PrecipIntensity > MeasurableThreshold);
 			}
 			else
 			{
@@ -77,10 +94,14 @@ namespace WeatherLink.Services
 			return retVal;
 		}
 
+		/// <inheritdoc/>
 		public async Task<WeatherBasedTrafficAdvice> GetTrafficAdviceForATime(double latitude, double longitude, double hoursFromNow, int travelTime)
 		{
-			var forecastResponse = await _darkSkyService.GetForecast(latitude, longitude);
-			if (forecastResponse?.Response?.Hourly == null) return null;
+			var forecastResponse = await darkSkyService.GetForecast(latitude, longitude);
+			if (forecastResponse?.Response?.Hourly == null)
+			{
+				return null;
+			}
 
 			var forecast = forecastResponse.Response;
 			var retVal = new WeatherBasedTrafficAdvice { Currently = forecast.Currently, DataSource = forecastResponse?.DataSource, AttributionLine = forecastResponse?.AttributionLine };
@@ -119,7 +140,10 @@ namespace WeatherLink.Services
 					.Where(x => Math.Abs((x.DateTime - retVal.TargetTime.Value).Hours) <= 1)
 					.ToList();
 
-				if (!range.Any(x => x.PrecipIntensity > 0)) return retVal;
+				if (!range.Any(x => x.PrecipIntensity > 0))
+				{
+					return retVal;
+				}
 
 				retVal.BestTimeToLeave = range.MinBy(x => x.PrecipIntensity).First();
 			}

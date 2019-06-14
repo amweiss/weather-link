@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WeatherLink.Tests</name>
+    </assembly>
+    <members>
+        <member name="T:WeatherLink.UnitTests.ExtensionMethods.DataPointListExtensionsUnitTests">
+            <summary>
+            Unit tests for a List of <see cref="T:DarkSky.Models.DataPoint"/>.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,8 +1,11 @@
-using DarkSky.Models;
-using System.Threading.Tasks;
+// Copyright (c) Adam Weiss. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace WeatherLink.Services
 {
+	using System.Threading.Tasks;
+	using DarkSky.Models;
+
 	/// <summary>
 	/// A service to get a Dark Sky forecast for a latitude and longitude.
 	/// </summary>

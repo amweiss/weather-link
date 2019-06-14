@@ -1,28 +1,32 @@
-﻿using DarkSky.Models;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
+﻿// Copyright (c) Adam Weiss. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace WeatherLink.UnitTests.ExtensionMethods
 {
+	using System.Collections.Generic;
+	using System.Linq;
+	using DarkSky.Models;
+	using Xunit;
+
+	/// <summary>
+	/// Unit tests for a List of <see cref="DataPoint"/>.
+	/// </summary>
 	public class DataPointListExtensionsUnitTests
 	{
-		// Forecast _mockBuffaloData = JsonConvert.DeserializeObject<Forecast>(
-		//     File.ReadAllText($"{AppContext.BaseDirectory}/Data/BexarTX.json"));
-
-		//List<DataPoint> _trivialData = new List<DataPoint>
-		//{
-		//	new DataPoint{ Time = 0, PrecipIntensity = 6},
-		//	new DataPoint{ Time = 1, PrecipIntensity = 7},
-		//	new DataPoint{ Time = 2, PrecipIntensity = 8},
-		//	new DataPoint{ Time = 3, PrecipIntensity = 2},
-		//	new DataPoint{ Time = 4, PrecipIntensity = 0},
-		//	new DataPoint{ Time = 5, PrecipIntensity = 6},
-		//	new DataPoint{ Time = 6, PrecipIntensity = 7},
-		//	new DataPoint{ Time = 7, PrecipIntensity = 8},
-		//	new DataPoint{ Time = 8, PrecipIntensity = 9},
-		//	new DataPoint{ Time = 9, PrecipIntensity = 0},
-		//};
+		// Forecast _mockBuffaloData = JsonConvert.DeserializeObject<Forecast>(File.ReadAllText($"{AppContext.BaseDirectory}/Data/BexarTX.json"));
+		private readonly List<DataPoint> trivialData = new List<DataPoint>
+		{
+			new DataPoint { PrecipIntensity = 6 },
+			new DataPoint { PrecipIntensity = 7 },
+			new DataPoint { PrecipIntensity = 8 },
+			new DataPoint { PrecipIntensity = 2 },
+			new DataPoint { PrecipIntensity = 0 },
+			new DataPoint { PrecipIntensity = 6 },
+			new DataPoint { PrecipIntensity = 7 },
+			new DataPoint { PrecipIntensity = 8 },
+			new DataPoint { PrecipIntensity = 9 },
+			new DataPoint { PrecipIntensity = 0 },
+		};
 
 		[Fact]
 		public void EmptyListReturnsEmptyEnumerable()
@@ -33,45 +37,45 @@ namespace WeatherLink.UnitTests.ExtensionMethods
 			Assert.Empty(result);
 		}
 
-		//[Fact]
-		//public void IncreasingListReturnsConsecutiveEnumerable()
-		//{
-		//	var input = _trivialData.Take(3).ToList();
-		//	var result = input.MinimumPrecipitation(2);
+		[Fact]
+		public void IncreasingListReturnsConsecutiveEnumerable()
+		{
+			var input = trivialData.Take(3).ToList();
+			var result = input.MinimumPrecipitation(2);
 
-		//	Assert.Equal(0, result.ElementAt(0).Time);
-		//	Assert.Equal(1, result.ElementAt(1).Time);
-		//}
+			Assert.Equal(6, result.ElementAt(0).PrecipIntensity);
+			Assert.Equal(7, result.ElementAt(1).PrecipIntensity);
+		}
 
-		//[Fact]
-		//public void NonIncreasingListReturnedWithinLargerSet()
-		//{
-		//	var input = _trivialData;
-		//	var result = input.MinimumPrecipitation(3);
+		[Fact]
+		public void NonIncreasingListReturnedWithinLargerSet()
+		{
+			var input = trivialData;
+			var result = input.MinimumPrecipitation(3);
 
-		//	Assert.Equal(3, result.ElementAt(0).Time);
-		//	Assert.Equal(4, result.ElementAt(1).Time);
-		//	Assert.Equal(5, result.ElementAt(2).Time);
-		//}
+			Assert.Equal(2, result.ElementAt(0).PrecipIntensity);
+			Assert.Equal(0, result.ElementAt(1).PrecipIntensity);
+			Assert.Equal(6, result.ElementAt(2).PrecipIntensity);
+		}
 
-		//[Theory]
-		//[InlineData(1)]
-		//[InlineData(10)]
-		//public void ReturnsNonEmptyEnumerable(int value)
-		//{
-		//	var input = _trivialData;
-		//	var result = input.MinimumPrecipitation(value);
+		[Theory]
+		[InlineData(1)]
+		[InlineData(10)]
+		public void ReturnsNonEmptyEnumerable(int value)
+		{
+			var input = trivialData;
+			var result = input.MinimumPrecipitation(value);
 
-		//	Assert.NotEmpty(result);
-		//}
+			Assert.NotEmpty(result);
+		}
 
-		//[Fact]
-		//public void ZeroMinutesReturnsEmptyEnumerable()
-		//{
-		//	var input = _trivialData;
-		//	var result = input.MinimumPrecipitation(0);
+		[Fact]
+		public void ZeroMinutesReturnsEmptyEnumerable()
+		{
+			var input = trivialData;
+			var result = input.MinimumPrecipitation(0);
 
-		//	Assert.Empty(result);
-		//}
+			Assert.Empty(result);
+		}
 	}
 }

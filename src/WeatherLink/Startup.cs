@@ -1,21 +1,25 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using NSwag.AspNetCore;
-using WeatherLink.Models;
-using WeatherLink.Services;
-using NSwag;
+// Copyright (c) Adam Weiss. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace WeatherLink
 {
+	using Microsoft.AspNetCore.Builder;
+	using Microsoft.AspNetCore.Hosting;
+	using Microsoft.Extensions.Configuration;
+	using Microsoft.Extensions.DependencyInjection;
+	using Microsoft.Extensions.Hosting;
+	using WeatherLink.Models;
+	using WeatherLink.Services;
+
+	/// <summary>
+	/// Start up configuration class.
+	/// </summary>
 	internal class Startup
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Startup"/> class.
+		/// </summary>
+		/// <param name="env">Hosting environment.</param>
 		public Startup(IWebHostEnvironment env)
 		{
 			var builder = new ConfigurationBuilder()
@@ -26,9 +30,16 @@ namespace WeatherLink
 			Configuration = builder.Build();
 		}
 
+		/// <summary>
+		/// Gets the configuration object.
+		/// </summary>
 		public IConfigurationRoot Configuration { get; }
 
-		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+		/// <summary>
+		/// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+		/// </summary>
+		/// <param name="app">Builder object for the running application.</param>
+		/// <param name="env">Hosting environment.</param>
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
 			if (env.IsDevelopment())
@@ -56,11 +67,14 @@ namespace WeatherLink
 			app.UseSwaggerUi3();
 		}
 
-		// This method gets called by the runtime. Use this method to add services to the container.
+		/// <summary>
+		/// This method gets called by the runtime. Use this method to add services to the container.
+		/// </summary>
+		/// <param name="services">The service injector.</param>
 		public void ConfigureServices(IServiceCollection services)
 		{
 			// Add framework services
-			services.AddMvc().AddNewtonsoftJson(); //TODO: Change this to AddControllers when possible
+			services.AddControllers();
 			services.AddHealthChecks();
 			services.AddOptions();
 
@@ -81,7 +95,6 @@ namespace WeatherLink
 			{
 				c.Title = "WeatherLink";
 				c.Description = "An API to get weather based advice.";
-				c.PostProcess = (document) => document.Schemes = new[] { OpenApiSchema.Https };
 			});
 		}
 	}

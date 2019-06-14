@@ -1,18 +1,25 @@
+// Copyright (c) Adam Weiss. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 namespace WeatherLink.Models
 {
+	using System.Text.Json.Serialization;
+
 	/// <summary>
 	/// A representation of what Slack can recieve on their webhook.
 	/// </summary>
 	public class SlackResponse
 	{
 		/// <summary>
-		/// The type of the response that will be posted.
+		/// Gets or sets the type of the response that will be posted.
 		/// </summary>
-		public string response_type { get; set; }
+		[JsonPropertyName("response_type")]
+		public string ResponseType { get; set; }
 
 		/// <summary>
-		/// The body of the response.
+		/// Gets or sets the body of the response.
 		/// </summary>
-		public string text { get; set; }
+		[JsonPropertyName("text")]
+		public string Text { get; set; }
 	}
 }

@@ -1,8 +1,11 @@
-using System.Threading.Tasks;
-using WeatherLink.Models;
+// Copyright (c) Adam Weiss. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace WeatherLink.Services
 {
+	using System.Threading.Tasks;
+	using WeatherLink.Models;
+
 	/// <summary>
 	/// A service to get traffic advice.
 	/// </summary>
@@ -14,7 +17,7 @@ namespace WeatherLink.Services
 		/// <param name="latitude">The latitude in degrees.</param>
 		/// <param name="longitude">The longitude in degrees.</param>
 		/// <param name="travelTime">The duration of the trip normally in minutes.</param>
-		/// <returns>A string of traffic advice</returns>
+		/// <returns>A string of traffic advice.</returns>
 		Task<WeatherBasedTrafficAdvice> GetTrafficAdvice(double latitude, double longitude, int travelTime = 20);
 
 		/// <summary>

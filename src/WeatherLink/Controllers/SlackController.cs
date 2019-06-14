@@ -1,112 +1,131 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using WeatherLink.Models;
-using WeatherLink.Services;
+// Copyright (c) Adam Weiss. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace WeatherLink.Controllers
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Net;
+	using System.Net.Http;
+	using System.Text.RegularExpressions;
+	using System.Threading.Tasks;
+	using Microsoft.AspNetCore.Mvc;
+	using Microsoft.Extensions.Options;
+	using Newtonsoft.Json;
+	using WeatherLink.Models;
+	using WeatherLink.Services;
+
 	/// <summary>
 	/// Interact with the traffic advice service from Slack.
 	/// </summary>
 	[Route("api/[controller]")]
 	public class SlackController : Controller
 	{
-		private readonly IDistanceToDurationService _distanceToDurationService;
-		private readonly IGeocodeService _geocodeService;
-		private readonly IOptions<WeatherLinkSettings> _optionsAccessor;
-		private readonly ITrafficAdviceService _trafficAdviceService;
-		private readonly SlackWorkspaceAppContext _context;
+		private readonly IDistanceToDurationService distanceToDurationService;
+		private readonly IGeocodeService geocodeService;
+		private readonly IOptions<WeatherLinkSettings> optionsAccessor;
+		private readonly ITrafficAdviceService trafficAdviceService;
+		private readonly SlackWorkspaceAppContext context;
 
-		//TODO: I don't like this
-		private readonly TrafficAdviceController _adviceController;
+		// TODO: I don't like this
+		private readonly TrafficAdviceController adviceController;
 
 		/// <summary>
-		/// Interact with the traffic advice service from Slack.
+		/// Initializes a new instance of the <see cref="SlackController"/> class.
 		/// </summary>
-		public SlackController(IOptions<WeatherLinkSettings> optionsAccessor, ITrafficAdviceService trafficAdviceService, IGeocodeService geocodeService, IDistanceToDurationService distanceToDurationService, SlackWorkspaceAppContext slackWorkspaceAppContext)
+		/// <param name="optionsAccessor">Service to access options from startup.</param>
+		/// <param name="trafficAdviceService">Service to get traffic advice.</param>
+		/// <param name="geocodeService">Service to turn text into a geolocation.</param>
+		/// <param name="distanceToDurationService">Service to convert a distance to a duration based on traffic.</param>
+		/// <param name="slackWorkspaceAppContext">Context to database of slack workspace apps.</param>
+		public SlackController(
+			IOptions<WeatherLinkSettings> optionsAccessor,
+			ITrafficAdviceService trafficAdviceService,
+			IGeocodeService geocodeService,
+			IDistanceToDurationService distanceToDurationService,
+			SlackWorkspaceAppContext slackWorkspaceAppContext)
 		{
-			_optionsAccessor = optionsAccessor;
-			_trafficAdviceService = trafficAdviceService;
-			_geocodeService = geocodeService;
-			_distanceToDurationService = distanceToDurationService;
-			_context = slackWorkspaceAppContext;
-			_adviceController = new TrafficAdviceController(_optionsAccessor, _trafficAdviceService, _geocodeService, _distanceToDurationService);
+			this.optionsAccessor = optionsAccessor ?? throw new ArgumentNullException(nameof(optionsAccessor));
+			this.trafficAdviceService = trafficAdviceService ?? throw new ArgumentNullException(nameof(trafficAdviceService));
+			this.geocodeService = geocodeService ?? throw new ArgumentNullException(nameof(geocodeService));
+			this.distanceToDurationService = distanceToDurationService ?? throw new ArgumentNullException(nameof(distanceToDurationService));
+			context = slackWorkspaceAppContext ?? throw new ArgumentNullException(nameof(slackWorkspaceAppContext));
+			adviceController = new TrafficAdviceController(this.trafficAdviceService, this.geocodeService, this.distanceToDurationService);
 		}
 
 		/// <summary>
 		/// An endpoint for installing the app in Slack.
 		/// </summary>
+		/// <returns>Slack intall button HTML.</returns>
 		[Route("install")]
 		[HttpGet]
 		public ContentResult Install()
 		{
-			string button = $"<a href=\"https://slack.com/oauth/authorize?scope=incoming-webhook,commands,bot&client_id={_optionsAccessor.Value.SlackClientId}&redirect_uri=https://{HttpContext.Request.Host}/api/slack/authorize\"><img alt=\"Add to Slack\" height=\"40\" width=\"139\" src=\"https://platform.slack-edge.com/img/add_to_slack.png\" srcset=\"https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x\" /></a>";
+			string button = $"<a href=\"https://slack.com/oauth/authorize?scope=incoming-webhook,commands,bot&client_id={optionsAccessor.Value.SlackClientId}&redirect_uri=https://{HttpContext.Request.Host}/api/slack/authorize\"><img alt=\"Add to Slack\" height=\"40\" width=\"139\" src=\"https://platform.slack-edge.com/img/add_to_slack.png\" srcset=\"https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x\" /></a>";
 			return new ContentResult
 			{
 				Content = button,
-				ContentType = "text/html"
+				ContentType = "text/html",
 			};
 		}
 
 		/// <summary>
 		/// An endpoint for authorizing use in Slack.
 		/// </summary>
+		/// <param name="code">The code sent from Slack for the authorization check.</param>
+		/// <returns>A message that authorization has worked.</returns>
 		[Route("authorize")]
 		[HttpGet]
 		public async Task<ContentResult> Authorize(string code)
 		{
+			if (code is null)
+			{
+				throw new ArgumentNullException(nameof(code));
+			}
+
 			var formContent = new List<KeyValuePair<string, string>>
 			{
-				new KeyValuePair<string, string>("client_id", _optionsAccessor.Value.SlackClientId),
-				new KeyValuePair<string, string>("client_secret", _optionsAccessor.Value.SlackClientSecret),
+				new KeyValuePair<string, string>("client_id", optionsAccessor.Value.SlackClientId),
+				new KeyValuePair<string, string>("client_secret", optionsAccessor.Value.SlackClientSecret),
 				new KeyValuePair<string, string>("code", code),
-				new KeyValuePair<string, string>("redirect_uri", $"https://{HttpContext.Request.Host}/api/slack/authorize")
+				new KeyValuePair<string, string>("redirect_uri", $"https://{HttpContext.Request.Host}/api/slack/authorize"),
 			};
 
-			var httpClient = new HttpClient();
-			var request = new HttpRequestMessage(HttpMethod.Post, $"{_optionsAccessor.Value.SlackApiBase}api/oauth.token")
-			{
-				Content = new FormUrlEncodedContent(formContent)
-			};
-			var result = await httpClient.SendAsync(request);
+			using var httpClient = new HttpClient();
+			using var request = new HttpRequestMessage(HttpMethod.Post, $"{optionsAccessor.Value.SlackApiBase}api/oauth.token");
+			request.Content = new FormUrlEncodedContent(formContent);
+
+			using var result = await httpClient.SendAsync(request);
 			var resultJsonString = await result.Content.ReadAsStringAsync();
 			var workspaceTokenResponse = JsonConvert.DeserializeObject<dynamic>(resultJsonString);
 
-			await _context.Database.EnsureCreatedAsync();
-			_context.WorkspaceTokens.Add(new WorkspaceToken
+			context.Database.EnsureCreated();
+			context.WorkspaceTokens.Add(new WorkspaceToken
 			{
-				Id = new Guid(),
+				Id = default,
 				AppId = workspaceTokenResponse.app_id,
 				TeamId = workspaceTokenResponse.team_id,
-				Token = workspaceTokenResponse.access_token
+				Token = workspaceTokenResponse.access_token,
 			});
-			await _context.SaveChangesAsync();
+			context.SaveChanges();
 
 			return new ContentResult
 			{
 				Content = "All set up!",
-				ContentType = "text/html"
+				ContentType = "text/html",
 			};
 		}
 
 		/// <summary>
 		/// An endpoint for handling messages from slack.
 		/// </summary>
-		/// <param name="text">The slack message, it should match "^(?:in (\d*[.,]?\d*) hours? from )?(.+?)(?: for (.+))?$"</param>
+		/// <param name="text">The slack message, it should match "^(?:in (\d*[.,]?\d*) hours? from )?(.+?)(?: for (.+))?$".</param>
 		/// <param name="token">The slack token to verify it's a team that is setup in WeatherLinkSettings.SlackTokens.</param>
 		/// <returns>A string value describing when to leave based on the weather.</returns>
 		[HttpPost]
 		public async Task<SlackResponse> SlackIntegration(string text, string token)
 		{
-			if (token != _optionsAccessor.Value.SlackVerificationToken)
+			if (token != optionsAccessor.Value.SlackVerificationToken)
 			{
 				Response.StatusCode = (int)HttpStatusCode.Unauthorized;
 				return null;
@@ -134,22 +153,22 @@ namespace WeatherLink.Controllers
 				{
 					if (string.IsNullOrWhiteSpace(endingLocation) && hasHours)
 					{
-						advice = await _adviceController.GetTrafficAdviceForATime(startingLocation, hoursFromNow);
+						advice = await adviceController.GetTrafficAdviceForATime(startingLocation, hoursFromNow);
 					}
 					else if (!string.IsNullOrWhiteSpace(endingLocation) && !hasHours)
 					{
-						advice = await _adviceController.GetTrafficAdviceToALocation(startingLocation, endingLocation);
+						advice = await adviceController.GetTrafficAdviceToALocation(startingLocation, endingLocation);
 					}
 					else if (!string.IsNullOrWhiteSpace(endingLocation) && hasHours)
 					{
-						advice = await _adviceController.GetTrafficAdviceToALocationForATime(startingLocation, endingLocation, hoursFromNow);
+						advice = await adviceController.GetTrafficAdviceToALocationForATime(startingLocation, endingLocation, hoursFromNow);
 					}
 					else
 					{
-						advice = await _adviceController.GetTrafficAdvice(startingLocation);
+						advice = await adviceController.GetTrafficAdvice(startingLocation);
 					}
 				}
-				catch (System.Exception)
+				catch (Exception)
 				{
 					advice = null;
 				}
@@ -160,7 +179,14 @@ namespace WeatherLink.Controllers
 				: $"{advice}{Environment.NewLine}<{advice.DataSource}|{advice.AttributionLine}>";
 
 			Response.StatusCode = (int)HttpStatusCode.OK;
-			return new SlackResponse { response_type = "in_channel", text = Regex.Replace(message, @"\r\n?|\n", "\n") };
+			return new SlackResponse { ResponseType = "in_channel", Text = Regex.Replace(message, @"\r\n?|\n", "\n") };
+		}
+
+		/// <inheritdoc/>
+		protected override void Dispose(bool disposing)
+		{
+			base.Dispose(disposing);
+			adviceController.Dispose();
 		}
 	}
 }

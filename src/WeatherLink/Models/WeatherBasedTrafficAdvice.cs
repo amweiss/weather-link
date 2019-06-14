@@ -1,62 +1,65 @@
-﻿using DarkSky.Models;
-using Humanizer;
-using System;
-using System.Text;
+﻿// Copyright (c) Adam Weiss. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace WeatherLink.Models
 {
+	using System;
+	using System.Text;
+	using DarkSky.Models;
+	using Humanizer;
+
 	/// <summary>
 	/// A collection of data that provides advice based on weather data.
 	/// </summary>
 	public class WeatherBasedTrafficAdvice
 	{
 		/// <summary>
-		/// Text to show where the data comes from.
+		/// Gets or sets text to show where the data comes from.
 		/// </summary>
 		public string AttributionLine { get; set; }
 
 		/// <summary>
-		/// The point in time that would be the best to leave based on the weather.
+		/// Gets or sets the point in time that would be the best to leave based on the weather.
 		/// </summary>
 		public DataPoint BestTimeToLeave { get; set; }
 
 		/// <summary>
-		/// The point in time and precipitation for the time closest to the current time.
+		/// Gets or sets the point in time and precipitation for the time closest to the current time.
 		/// </summary>
 		public DataPoint Currently { get; set; }
 
 		/// <summary>
-		/// The data source.
+		/// Gets or sets the data source.
 		/// </summary>
 		public string DataSource { get; set; }
 
 		/// <summary>
-		/// The point in time with the minimum precipitation.
+		/// Gets or sets the point in time with the minimum precipitation.
 		/// </summary>
 		public DataPoint MinimumPrecipitation { get; set; }
 
 		/// <summary>
-		/// The next point in time for heavy precipitation.
+		/// Gets or sets the next point in time for heavy precipitation.
 		/// </summary>
 		public DataPoint NextHeavyPrecipitation { get; set; }
 
 		/// <summary>
-		/// The next point in time for moderate precipitation.
+		/// Gets or sets the next point in time for moderate precipitation.
 		/// </summary>
 		public DataPoint NextModeratePrecipitation { get; set; }
 
 		/// <summary>
-		/// The point in time with the next measurable precipitation.
+		/// Gets or sets the point in time with the next measurable precipitation.
 		/// </summary>
 		public DataPoint NextPrecipitation { get; set; }
 
 		/// <summary>
-		/// The next point in time that has measurable precipitation after the next minimum level of precipitation.
+		/// Gets or sets the next point in time that has measurable precipitation after the next minimum level of precipitation.
 		/// </summary>
 		public DataPoint NextPrecipitationAfterMinimum { get; set; }
 
 		/// <summary>
-		/// The desired time to get adivce for.
+		/// Gets or sets the desired time to get adivce for.
 		/// </summary>
 		public DateTime? TargetTime { get; set; }
 
@@ -92,19 +95,19 @@ namespace WeatherLink.Models
 
 					if (NextModeratePrecipitation != null)
 					{
-						var precipType = (NextModeratePrecipitation.PrecipType == PrecipitationType.None ? Currently.PrecipType : NextModeratePrecipitation.PrecipType);
+						var precipType = NextModeratePrecipitation.PrecipType == PrecipitationType.None ? Currently.PrecipType : NextModeratePrecipitation.PrecipType;
 						sb.AppendLine($"{precipType.ToString().Transform(To.SentenceCase)} getting worse {NextModeratePrecipitation.DateTime.Humanize(homeDateTimeOffset)}.");
 					}
 
 					if (NextHeavyPrecipitation != null)
 					{
-						var precipType = (NextHeavyPrecipitation.PrecipType == PrecipitationType.None ? Currently.PrecipType : NextHeavyPrecipitation.PrecipType);
+						var precipType = NextHeavyPrecipitation.PrecipType == PrecipitationType.None ? Currently.PrecipType : NextHeavyPrecipitation.PrecipType;
 						sb.AppendLine($"{precipType.ToString().Transform(To.SentenceCase)} getting much worse {NextHeavyPrecipitation.DateTime.Humanize(homeDateTimeOffset)}.");
 					}
 
 					if (NextPrecipitationAfterMinimum != null)
 					{
-						var precipType = (NextPrecipitationAfterMinimum.PrecipType == PrecipitationType.None ? Currently.PrecipType : NextPrecipitationAfterMinimum.PrecipType);
+						var precipType = NextPrecipitationAfterMinimum.PrecipType == PrecipitationType.None ? Currently.PrecipType : NextPrecipitationAfterMinimum.PrecipType;
 						sb.AppendLine($"{precipType.ToString().Transform(To.SentenceCase)} starting again after lowest point {NextPrecipitationAfterMinimum.DateTime.Humanize(homeDateTimeOffset)}.");
 					}
 				}
@@ -114,10 +117,12 @@ namespace WeatherLink.Models
 					{
 						sb.AppendLine($"Next light {NextPrecipitation.PrecipType} is {NextPrecipitation.DateTime.Humanize(homeDateTimeOffset)}.");
 					}
+
 					if (NextModeratePrecipitation?.PrecipType != null)
 					{
 						sb.AppendLine($"Next moderate {NextModeratePrecipitation.PrecipType} is {NextModeratePrecipitation.DateTime.Humanize(homeDateTimeOffset)}.");
 					}
+
 					if (NextHeavyPrecipitation?.PrecipType != null)
 					{
 						sb.AppendLine($"Next heavy {NextHeavyPrecipitation.PrecipType} is {NextHeavyPrecipitation.DateTime.Humanize(homeDateTimeOffset)}.");
