@@ -1,88 +1,101 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using NSwag.AspNetCore;
-using WeatherLink.Models;
-using WeatherLink.Services;
-using NSwag;
+// Copyright (c) Adam Weiss. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace WeatherLink
 {
-	internal class Startup
-	{
-		public Startup(IWebHostEnvironment env)
-		{
-			var builder = new ConfigurationBuilder()
-				.SetBasePath(env.ContentRootPath)
-				.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-				.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-				.AddEnvironmentVariables();
-			Configuration = builder.Build();
-		}
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+    using WeatherLink.Models;
+    using WeatherLink.Services;
 
-		public IConfigurationRoot Configuration { get; }
+    /// <summary>
+    /// Start up configuration class.
+    /// </summary>
+    internal class Startup
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Startup"/> class.
+        /// </summary>
+        /// <param name="env">Hosting environment.</param>
+        public Startup(IWebHostEnvironment env)
+        {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+                .AddEnvironmentVariables();
+            Configuration = builder.Build();
+        }
 
-		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-		{
-			if (env.IsDevelopment())
-			{
-				app.UseDeveloperExceptionPage();
-			}
-			else
-			{
-				app.UseExceptionHandler("/Error");
-				app.UseHsts();
-			}
+        /// <summary>
+        /// Gets the configuration object.
+        /// </summary>
+        public IConfigurationRoot Configuration { get; }
 
-			app.UseHttpsRedirection();
-			app.UseStaticFiles();
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// </summary>
+        /// <param name="app">Builder object for the running application.</param>
+        /// <param name="env">Hosting environment.</param>
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Error");
+                app.UseHsts();
+            }
 
-			app.UseRouting();
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
 
-			app.UseEndpoints(endpoints =>
-			{
-				endpoints.MapControllers();
-				endpoints.MapHealthChecks("/health");
-			});
+            app.UseRouting();
 
-			app.UseOpenApi();
-			app.UseSwaggerUi3();
-		}
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health");
+            });
 
-		// This method gets called by the runtime. Use this method to add services to the container.
-		public void ConfigureServices(IServiceCollection services)
-		{
-			// Add framework services
-			services.AddMvc().AddNewtonsoftJson(); //TODO: Change this to AddControllers when possible
-			services.AddHealthChecks();
-			services.AddOptions();
+            app.UseOpenApi();
+            app.UseSwaggerUi3();
+        }
 
-			// Get config
-			services.Configure<WeatherLinkSettings>(Configuration);
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to add services to the container.
+        /// </summary>
+        /// <param name="services">The service injector.</param>
+        public void ConfigureServices(IServiceCollection services)
+        {
+            // Add framework services
+            services.AddControllers();
+            services.AddHealthChecks();
+            services.AddOptions();
 
-			// Setup token db
-			services.AddDbContext<SlackWorkspaceAppContext>();
+            // Get config
+            services.Configure<WeatherLinkSettings>(Configuration);
 
-			// Add custom services
-			services.AddTransient<ITrafficAdviceService, WeatherBasedTrafficAdviceService>();
-			services.AddTransient<IGeocodeService, GoogleMapsGeocodeService>();
-			services.AddTransient<IDistanceToDurationService, GoogleMapsDistanceToDurationService>();
-			services.AddTransient<IDarkSkyService, HourlyAndMinutelyDarkSkyService>();
+            // Setup token db
+            services.AddDbContext<SlackWorkspaceAppContext>();
 
-			// Configure swagger
-			services.AddOpenApiDocument(c =>
-			{
-				c.Title = "WeatherLink";
-				c.Description = "An API to get weather based advice.";
-				c.PostProcess = (document) => document.Schemes = new[] { OpenApiSchema.Https };
-			});
-		}
-	}
+            // Add custom services
+            services.AddTransient<ITrafficAdviceService, WeatherBasedTrafficAdviceService>();
+            services.AddTransient<IGeocodeService, GoogleMapsGeocodeService>();
+            services.AddTransient<IDistanceToDurationService, GoogleMapsDistanceToDurationService>();
+            services.AddTransient<IDarkSkyService, HourlyAndMinutelyDarkSkyService>();
+
+            // Configure swagger
+            services.AddOpenApiDocument(c =>
+            {
+                c.Title = "WeatherLink";
+                c.Description = "An API to get weather based advice.";
+            });
+        }
+    }
 }

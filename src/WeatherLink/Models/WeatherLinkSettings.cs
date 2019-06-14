@@ -1,65 +1,66 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) Adam Weiss. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace WeatherLink.Models
 {
-	/// <summary>
-	/// Container for the application settings.
-	/// </summary>
-	public sealed class WeatherLinkSettings
-	{
-		/// <summary>
-		/// The base URL for the Dark Sky API.
-		/// </summary>
-		public string DarkSkyApiBase { get; set; }
+    /// <summary>
+    /// Container for the application settings.
+    /// </summary>
+    public sealed class WeatherLinkSettings
+    {
+        /// <summary>
+        /// Gets or sets the base URL for the Dark Sky API.
+        /// </summary>
+        public string DarkSkyApiBase { get; set; }
 
-		/// <summary>
-		/// The API key for use with the DarkSky API.
-		/// </summary>
-		public string DarkSkyApiKey { get; set; }
+        /// <summary>
+        /// Gets or sets the API key for use with the DarkSky API.
+        /// </summary>
+        public string DarkSkyApiKey { get; set; }
 
-		/// <summary>
-		/// The base URL for the Google Maps API.
-		/// </summary>
-		public string GoogleMapsApiBase { get; set; }
+        /// <summary>
+        /// Gets or sets the base URL for the Google Maps API.
+        /// </summary>
+        public string GoogleMapsApiBase { get; set; }
 
-		/// <summary>
-		/// The API key for use with the Google Maps API.
-		/// </summary>
-		public string GoogleMapsApiKey { get; set; }
+        /// <summary>
+        /// Gets or sets the API key for use with the Google Maps API.
+        /// </summary>
+        public string GoogleMapsApiKey { get; set; }
 
-		/// <summary>
-		/// The base URL for the Slack API.
-		/// </summary>
-		public string SlackApiBase { get; set; }
+        /// <summary>
+        /// Gets or sets the base URL for the Slack API.
+        /// </summary>
+        public string SlackApiBase { get; set; }
 
-		/// <summary>
-		/// The ClientId for the Slack app.
-		/// </summary>
-		public string SlackClientId { get; set; }
+        /// <summary>
+        /// Gets or sets the ClientId for the Slack app.
+        /// </summary>
+        public string SlackClientId { get; set; }
 
-		/// <summary>
-		/// The Client secret for the Slack app.
-		/// </summary>
-		public string SlackClientSecret { get; set; }
+        /// <summary>
+        /// Gets or sets the Client secret for the Slack app.
+        /// </summary>
+        public string SlackClientSecret { get; set; }
 
-		/// <summary>
-		/// The verification token for Slack.
-		/// </summary>
-		public string SlackVerificationToken { get; set; }
+        /// <summary>
+        /// Gets or sets the verification token for Slack.
+        /// </summary>
+        public string SlackVerificationToken { get; set; }
 
-		/// <summary>
-		/// The connection string of the Slack token db.
-		/// </summary>
-		public string SlackTokenDbAuthKey { get; set; }
+        /// <summary>
+        /// Gets or sets the connection string of the Slack token db.
+        /// </summary>
+        public string SlackTokenDbAuthKey { get; set; }
 
-		/// <summary>
-		/// The connection string of the Slack token db.
-		/// </summary>
-		public string SlackTokenDbDatabaseName { get; set; }
+        /// <summary>
+        /// Gets or sets the connection string of the Slack token db.
+        /// </summary>
+        public string SlackTokenDbDatabaseName { get; set; }
 
-		/// <summary>
-		/// The connection string of the Slack token db.
-		/// </summary>
-		public string SlackTokenDbServiceEndpoint { get; set; }
-	}
+        /// <summary>
+        /// Gets or sets the connection string of the Slack token db.
+        /// </summary>
+        public string SlackTokenDbServiceEndpoint { get; set; }
+    }
 }
