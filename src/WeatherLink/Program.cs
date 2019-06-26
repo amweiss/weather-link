@@ -5,6 +5,7 @@ namespace WeatherLink
 {
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Hosting;
+    using System;
 
     /// <summary>
     /// Entry point class.
@@ -27,6 +28,12 @@ namespace WeatherLink
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+
+                    var foundPort = int.TryParse(Environment.GetEnvironmentVariable("PORT"), out var port);
+                    if (foundPort)
+                    {
+                        webBuilder.UseUrls($"http://*:{port}");
+                    }
                 });
     }
 }
