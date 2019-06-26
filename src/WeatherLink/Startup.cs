@@ -64,7 +64,10 @@ namespace WeatherLink
             });
 
             app.UseOpenApi();
-            app.UseSwaggerUi3();
+            app.UseSwaggerUi3(c =>
+            {
+                c.Path = "";
+            });
         }
 
         /// <summary>
