@@ -124,15 +124,14 @@ namespace WeatherLink.Controllers
                 && Math.Abs(DateTimeOffset.UtcNow.ToUnixTimeSeconds() - timestamp) <= 60 * 5)
             {
                 var signature = $"v0:{timestamp}:{Request.Body.ToString()}";
-                var encoding = new UTF8Encoding();
-                using var hmac = new HMACSHA256(encoding.GetBytes(optionsAccessor.Value.SlackSigningSecret));
-                var hashedSignature = hmac.ComputeHash(encoding.GetBytes(signature));
-                var mySignature = $"v0={hashedSignature}";
+                using var hmac = new HMACSHA256(Encoding.Default.GetBytes(optionsAccessor.Value.SlackSigningSecret));
+                var hashedSignature = hmac.ComputeHash(Encoding.Default.GetBytes(signature));
+                var mySignature = $"v0={Encoding.Default.GetString(hashedSignature)}";
 
                 Console.WriteLine($"mySignature: {mySignature}");
                 Console.WriteLine($"slackSignature: {Request.Headers?["X-Slack-Signature"]}");
 
-                signatureMatch = encoding.GetBytes(mySignature) == encoding.GetBytes(Request.Headers?["X-Slack-Signature"]);
+                signatureMatch = Encoding.Default.GetBytes(mySignature) == Encoding.Default.GetBytes(Request.Headers?["X-Slack-Signature"]);
             }
             return signatureMatch;
         }
