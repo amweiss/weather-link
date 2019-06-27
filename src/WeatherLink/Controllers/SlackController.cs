@@ -129,6 +129,9 @@ namespace WeatherLink.Controllers
                 var hashedSignature = hmac.ComputeHash(encoding.GetBytes(signature));
                 var mySignature = $"v0={hashedSignature}";
 
+                Console.WriteLine($"mySignature: {mySignature}");
+                Console.WriteLine($"slackSignature: {Request.Headers?["X-Slack-Signature"]}");
+
                 signatureMatch = encoding.GetBytes(mySignature) == encoding.GetBytes(Request.Headers?["X-Slack-Signature"]);
             }
             return signatureMatch;
