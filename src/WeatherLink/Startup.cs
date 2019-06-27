@@ -84,9 +84,6 @@ namespace WeatherLink
             // Get config
             services.Configure<WeatherLinkSettings>(Configuration);
 
-            // Setup token db
-            services.AddDbContext<SlackWorkspaceAppContext>();
-
             // Add custom services
             services.AddTransient<ITrafficAdviceService, WeatherBasedTrafficAdviceService>();
             services.AddTransient<IGeocodeService, GoogleMapsGeocodeService>();

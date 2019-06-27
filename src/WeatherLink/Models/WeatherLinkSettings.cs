@@ -34,33 +34,8 @@ namespace WeatherLink.Models
         public string SlackApiBase { get; set; }
 
         /// <summary>
-        /// Gets or sets the ClientId for the Slack app.
+        /// Gets or sets the secret to verify slack messages.
         /// </summary>
-        public string SlackClientId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Client secret for the Slack app.
-        /// </summary>
-        public string SlackClientSecret { get; set; }
-
-        /// <summary>
-        /// Gets or sets the verification token for Slack.
-        /// </summary>
-        public string SlackVerificationToken { get; set; }
-
-        /// <summary>
-        /// Gets or sets the connection string of the Slack token db.
-        /// </summary>
-        public string SlackTokenDbAuthKey { get; set; }
-
-        /// <summary>
-        /// Gets or sets the connection string of the Slack token db.
-        /// </summary>
-        public string SlackTokenDbDatabaseName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the connection string of the Slack token db.
-        /// </summary>
-        public string SlackTokenDbServiceEndpoint { get; set; }
+        public string SlackSigningSecret { get; set; }
     }
 }

@@ -10,6 +10,8 @@ namespace WeatherLink.Controllers
     using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
+    using System.Security.Cryptography;
+    using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using WeatherLink.Models;
@@ -25,7 +27,6 @@ namespace WeatherLink.Controllers
         private readonly IGeocodeService geocodeService;
         private readonly IOptions<WeatherLinkSettings> optionsAccessor;
         private readonly ITrafficAdviceService trafficAdviceService;
-        private readonly SlackWorkspaceAppContext context;
 
         // TODO: I don't like this
         private readonly TrafficAdviceController adviceController;
@@ -37,95 +38,28 @@ namespace WeatherLink.Controllers
         /// <param name="trafficAdviceService">Service to get traffic advice.</param>
         /// <param name="geocodeService">Service to turn text into a geolocation.</param>
         /// <param name="distanceToDurationService">Service to convert a distance to a duration based on traffic.</param>
-        /// <param name="slackWorkspaceAppContext">Context to database of slack workspace apps.</param>
         public SlackController(
             IOptions<WeatherLinkSettings> optionsAccessor,
             ITrafficAdviceService trafficAdviceService,
             IGeocodeService geocodeService,
-            IDistanceToDurationService distanceToDurationService,
-            SlackWorkspaceAppContext slackWorkspaceAppContext)
+            IDistanceToDurationService distanceToDurationService)
         {
             this.optionsAccessor = optionsAccessor ?? throw new ArgumentNullException(nameof(optionsAccessor));
             this.trafficAdviceService = trafficAdviceService ?? throw new ArgumentNullException(nameof(trafficAdviceService));
             this.geocodeService = geocodeService ?? throw new ArgumentNullException(nameof(geocodeService));
             this.distanceToDurationService = distanceToDurationService ?? throw new ArgumentNullException(nameof(distanceToDurationService));
-            context = slackWorkspaceAppContext ?? throw new ArgumentNullException(nameof(slackWorkspaceAppContext));
             adviceController = new TrafficAdviceController(this.trafficAdviceService, this.geocodeService, this.distanceToDurationService);
-        }
-
-        /// <summary>
-        /// An endpoint for installing the app in Slack.
-        /// </summary>
-        /// <returns>Slack intall button HTML.</returns>
-        [Route("install")]
-        [HttpGet]
-        public ContentResult Install()
-        {
-            var button = $"<a href=\"https://slack.com/oauth/authorize?scope=incoming-webhook,commands,bot&client_id={optionsAccessor.Value.SlackClientId}&redirect_uri=https://{HttpContext.Request.Host}/api/slack/authorize\"><img alt=\"Add to Slack\" height=\"40\" width=\"139\" src=\"https://platform.slack-edge.com/img/add_to_slack.png\" srcset=\"https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x\" /></a>";
-            return new ContentResult
-            {
-                Content = button,
-                ContentType = "text/html",
-            };
-        }
-
-        /// <summary>
-        /// An endpoint for authorizing use in Slack.
-        /// </summary>
-        /// <param name="code">The code sent from Slack for the authorization check.</param>
-        /// <returns>A message that authorization has worked.</returns>
-        [Route("authorize")]
-        [HttpGet]
-        public async Task<ContentResult> Authorize(string code)
-        {
-            if (code is null)
-            {
-                throw new ArgumentNullException(nameof(code));
-            }
-
-            var formContent = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("client_id", optionsAccessor.Value.SlackClientId),
-                new KeyValuePair<string, string>("client_secret", optionsAccessor.Value.SlackClientSecret),
-                new KeyValuePair<string, string>("code", code),
-                new KeyValuePair<string, string>("redirect_uri", $"https://{HttpContext.Request.Host}/api/slack/authorize"),
-            };
-
-            using var httpClient = new HttpClient();
-            using var request = new HttpRequestMessage(HttpMethod.Post, $"{optionsAccessor.Value.SlackApiBase}api/oauth.token");
-            request.Content = new FormUrlEncodedContent(formContent);
-
-            using var result = await httpClient.SendAsync(request);
-            var resultJsonString = await result.Content.ReadAsStringAsync();
-            var workspaceTokenResponse = JsonConvert.DeserializeObject<dynamic>(resultJsonString);
-
-            context.Database.EnsureCreated();
-            context.WorkspaceTokens.Add(new WorkspaceToken
-            {
-                Id = default,
-                AppId = workspaceTokenResponse.app_id,
-                TeamId = workspaceTokenResponse.team_id,
-                Token = workspaceTokenResponse.access_token,
-            });
-            context.SaveChanges();
-
-            return new ContentResult
-            {
-                Content = "All set up!",
-                ContentType = "text/html",
-            };
         }
 
         /// <summary>
         /// An endpoint for handling messages from slack.
         /// </summary>
         /// <param name="text">The slack message, it should match "^(?:in (\d*[.,]?\d*) hours? from )?(.+?)(?: for (.+))?$".</param>
-        /// <param name="token">The slack token to verify it's a team that is setup in WeatherLinkSettings.SlackTokens.</param>
         /// <returns>A string value describing when to leave based on the weather.</returns>
         [HttpPost]
-        public async Task<SlackResponse> SlackIntegration(string text, string token)
+        public async Task<SlackResponse> SlackIntegration(string text)
         {
-            if (token != optionsAccessor.Value.SlackVerificationToken)
+            if (!VerifySlackSignature())
             {
                 Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 return null;
@@ -180,6 +114,24 @@ namespace WeatherLink.Controllers
 
             Response.StatusCode = (int)HttpStatusCode.OK;
             return new SlackResponse { ResponseType = "in_channel", Text = Regex.Replace(message, @"\r\n?|\n", "\n") };
+        }
+
+        private bool VerifySlackSignature()
+        {
+            var signatureMatch = false;
+            // Make sure request was recent to prevent replay attack.
+            if (int.TryParse(Request.Headers["X-Slack-Request-Timestamp"], out var timestamp)
+                && Math.Abs(DateTimeOffset.UtcNow.ToUnixTimeSeconds() - timestamp) <= 60 * 5)
+            {
+                var signature = $"v0:{timestamp}:{Request.Body.ToString()}";
+                var encoding = new UTF8Encoding();
+                using var hmac = new HMACSHA256(encoding.GetBytes(optionsAccessor.Value.SlackSigningSecret));
+                var hashedSignature = hmac.ComputeHash(encoding.GetBytes(signature));
+                var mySignature = $"v0={hashedSignature}";
+
+                signatureMatch = encoding.GetBytes(mySignature) == encoding.GetBytes(Request.Headers?["X-Slack-Signature"]);
+            }
+            return signatureMatch;
         }
 
         /// <inheritdoc/>

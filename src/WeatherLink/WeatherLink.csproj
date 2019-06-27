@@ -7,30 +7,11 @@
         <PreserveCompilationContext>true</PreserveCompilationContext>
         <AssemblyName>WeatherLink</AssemblyName>
         <PackageId>WeatherLink</PackageId>
-        <ApplicationInsightsResourceId>/subscriptions/629450de-4ae5-463a-8b73-da094d12e0d1/resourcegroups/weatherlink9e9c/providers/microsoft.insights/components/weather-link</ApplicationInsightsResourceId>
-        <ApplicationInsightsAnnotationResourceId>/subscriptions/629450de-4ae5-463a-8b73-da094d12e0d1/resourcegroups/weatherlink9e9c/providers/microsoft.insights/components/weather-link</ApplicationInsightsAnnotationResourceId>
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Remove="stylecop.json" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <AdditionalFiles Include="stylecop.json" />
-    </ItemGroup>
-
-    <ItemGroup>
-    <Folder Include="Properties\" />
-    </ItemGroup>
-
-    <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0-preview6.19307.2" />
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.3">
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Cosmos" Version="3.0.0-preview6.19304.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.0-preview6.19304.10">
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.4-beta1.final">
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -39,10 +20,6 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="3.0.0-preview6.19304.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.0-preview6.19304.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="3.0.0-preview6.19304.6" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0-preview6.19304.6" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Configuration" Version="3.0.0-preview6.19304.6" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.0.0-preview6.19304.6" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.0.0-preview6.19304.6" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.0.0-preview6.19304.6" />
     <PackageReference Include="Humanizer.Core" Version="2.6.2" />
     <PackageReference Include="DarkSkyCore" Version="5.1.16" />
