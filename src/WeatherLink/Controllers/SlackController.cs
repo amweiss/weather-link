@@ -134,6 +134,8 @@ namespace WeatherLink.Controllers
                 var mySignature = $"v0={BitConverter.ToString(hmac.Hash).Replace("-", string.Empty, StringComparison.InvariantCulture)}";
                 var slackSignature = Request.Headers?["X-Slack-Signature"];
 
+                Console.WriteLine($"body: {body}");
+                Console.WriteLine($"timestamp: {timestamp}");
                 Console.WriteLine($"mySignature: {mySignature}");
                 Console.WriteLine($"slackSignature: {slackSignature}");
 
