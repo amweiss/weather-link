@@ -13,4 +13,3 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Handled with DI", Scope = "type", Target = "~T:WeatherLink.Startup")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Handled with DI", Scope = "type", Target = "~T:WeatherLink.Services.WeatherBasedTrafficAdviceService")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "We want to return a message either way.", Scope = "member", Target = "~M:WeatherLink.Controllers.SlackController.SlackIntegration(System.String)~System.Threading.Tasks.Task{WeatherLink.Models.SlackResponse}")]
-

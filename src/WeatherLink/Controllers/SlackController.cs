@@ -3,11 +3,15 @@
 
 namespace WeatherLink.Controllers
 {
+    using Microsoft.AspNetCore.Http.Internal;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Options;
     using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
+    using System.IO;
+    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Security.Cryptography;
@@ -123,16 +127,17 @@ namespace WeatherLink.Controllers
             if (int.TryParse(Request.Headers["X-Slack-Request-Timestamp"], out var timestamp)
                 && Math.Abs(DateTimeOffset.UtcNow.ToUnixTimeSeconds() - timestamp) <= 60 * 5)
             {
-                var signature = $"v0:{timestamp}:{Request.Body.ToString()}";
-                var encoding = new ASCIIEncoding();
-                using var hmac = new HMACSHA256(encoding.GetBytes(optionsAccessor.Value.SlackSigningSecret));
-                var hashedSignature = hmac.ComputeHash(encoding.GetBytes(signature));
-                var mySignature = $"v0={encoding.GetString(hashedSignature)}";
+                var body = string.Join('&', Request.Form.Select(k => k).Select((k, v) => $"{k.Key}={k.Value}"));
+                var signature = $"v0:{timestamp}:{body}";
+                using var hmac = new HMACSHA256(Encoding.Default.GetBytes(optionsAccessor.Value.SlackSigningSecret));
+                var hashedSignature = hmac.ComputeHash(Encoding.Default.GetBytes(signature));
+                var mySignature = $"v0={BitConverter.ToString(hmac.Hash).Replace("-", string.Empty, StringComparison.InvariantCulture)}";
+                var slackSignature = Request.Headers?["X-Slack-Signature"];
 
                 Console.WriteLine($"mySignature: {mySignature}");
-                Console.WriteLine($"slackSignature: {Request.Headers?["X-Slack-Signature"]}");
+                Console.WriteLine($"slackSignature: {slackSignature}");
 
-                signatureMatch = encoding.GetBytes(mySignature) == encoding.GetBytes(Request.Headers?["X-Slack-Signature"]);
+                signatureMatch = string.Equals(mySignature, slackSignature, StringComparison.InvariantCultureIgnoreCase);
             }
             return signatureMatch;
         }
