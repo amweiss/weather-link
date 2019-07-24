@@ -1,19 +1,22 @@
-// Copyright (c) Adam Weiss. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#region
 
-namespace DarkSky.Models
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using DarkSky.Models;
+
+#endregion
+
+namespace WeatherLink.ExtensionMethods
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     /// <summary>
-    /// Extensions for an IEnumerable of DataPoints.
+    ///     Extensions for an IEnumerable of DataPoints.
     /// </summary>
     public static class DataPointListExtensions
     {
         /// <summary>
-        /// Finds the IEnumerable containing the DataPoints for the period of numberOfMinutes that contains the minimum amount of precipitation.
+        ///     Finds the IEnumerable containing the DataPoints for the period of numberOfMinutes that contains the minimum amount
+        ///     of precipitation.
         /// </summary>
         /// <param name="forecasts">The IEnumerable of DataPoints to act upon.</param>
         /// <param name="numberOfMinutes">The period of minutes desired to contain the minimum amount of precipitation.</param>

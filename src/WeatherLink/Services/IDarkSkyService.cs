@@ -1,18 +1,19 @@
-// Copyright (c) Adam Weiss. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#region
+
+using System.Threading.Tasks;
+using DarkSky.Models;
+
+#endregion
 
 namespace WeatherLink.Services
 {
-    using DarkSky.Models;
-    using System.Threading.Tasks;
-
     /// <summary>
-    /// A service to get a Dark Sky forecast for a latitude and longitude.
+    ///     A service to get a Dark Sky forecast for a latitude and longitude.
     /// </summary>
     public interface IDarkSkyService
     {
         /// <summary>
-        /// Make a request to get forecast data.
+        ///     Make a request to get forecast data.
         /// </summary>
         /// <param name="latitude">Latitude to request data for in decimal degrees.</param>
         /// <param name="longitude">Longitude to request data for in decimal degrees.</param>
