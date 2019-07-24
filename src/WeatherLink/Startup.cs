@@ -1,42 +1,43 @@
-// Copyright (c) Adam Weiss. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#region
+
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using WeatherLink.Models;
+using WeatherLink.Services;
+
+#endregion
 
 namespace WeatherLink
 {
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Hosting;
-    using WeatherLink.Models;
-    using WeatherLink.Services;
-
     /// <summary>
-    /// Start up configuration class.
+    ///     Start up configuration class.
     /// </summary>
     internal class Startup
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Startup"/> class.
+        ///     Initializes a new instance of the <see cref="Startup" /> class.
         /// </summary>
         /// <param name="env">Hosting environment.</param>
         public Startup(IWebHostEnvironment env)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+                .AddJsonFile("appsettings.json", true, true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
         }
 
         /// <summary>
-        /// Gets the configuration object.
+        ///     Gets the configuration object.
         /// </summary>
         public IConfigurationRoot Configuration { get; }
 
         /// <summary>
-        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        ///     This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </summary>
         /// <param name="app">Builder object for the running application.</param>
         /// <param name="env">Hosting environment.</param>
@@ -71,7 +72,7 @@ namespace WeatherLink
         }
 
         /// <summary>
-        /// This method gets called by the runtime. Use this method to add services to the container.
+        ///     This method gets called by the runtime. Use this method to add services to the container.
         /// </summary>
         /// <param name="services">The service injector.</param>
         public void ConfigureServices(IServiceCollection services)

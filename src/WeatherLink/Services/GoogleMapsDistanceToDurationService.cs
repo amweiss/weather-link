@@ -1,25 +1,26 @@
-// Copyright (c) Adam Weiss. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#region
+
+using System;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
+using WeatherLink.Models;
+
+#endregion
 
 namespace WeatherLink.Services
 {
-    using Microsoft.Extensions.Options;
-    using Newtonsoft.Json.Linq;
-    using System;
-    using System.Linq;
-    using System.Net.Http;
-    using System.Threading.Tasks;
-    using WeatherLink.Models;
-
     /// <summary>
-    /// A service for providing travel duration based on the Google Maps Distance Matrix API.
+    ///     A service for providing travel duration based on the Google Maps Distance Matrix API.
     /// </summary>
     public class GoogleMapsDistanceToDurationService : IDistanceToDurationService
     {
         private readonly IOptions<WeatherLinkSettings> optionsAccessor;
 
         /// <summary>
-        /// Create a new Google Maps Distance to Duration service based on optionsAccessor.
+        ///     Create a new Google Maps Distance to Duration service based on optionsAccessor.
         /// </summary>
         /// <param name="optionsAccessor">The options to use for the service.</param>
         public GoogleMapsDistanceToDurationService(IOptions<WeatherLinkSettings> optionsAccessor)
@@ -28,7 +29,7 @@ namespace WeatherLink.Services
         }
 
         /// <summary>
-        /// Find the travel time in minutes between two geocoded list.
+        ///     Find the travel time in minutes between two geocoded list.
         /// </summary>
         /// <param name="startingLocation">The starting location string to attempt to convert into a latitude and longitude.</param>
         /// <param name="endingLocation">The ending location string to attempt to convert into a latitude and longitude.</param>
@@ -37,7 +38,8 @@ namespace WeatherLink.Services
         {
             using (var client = new HttpClient())
             {
-                using var response = await client.GetAsync(new Uri($"{optionsAccessor.Value.GoogleMapsApiBase}maps/api/distancematrix/json?units=imperial&origins={startingLocation}&destinations={endingLocation}&key={optionsAccessor.Value.GoogleMapsApiKey}"));
+                using var response = await client.GetAsync(new Uri(
+                    $"{optionsAccessor.Value.GoogleMapsApiBase}maps/api/distancematrix/json?units=imperial&origins={startingLocation}&destinations={endingLocation}&key={optionsAccessor.Value.GoogleMapsApiKey}"));
 
                 if (!response.IsSuccessStatusCode)
                 {
