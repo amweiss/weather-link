@@ -89,7 +89,7 @@ namespace WeatherLink
             services.AddTransient<ITrafficAdviceService, WeatherBasedTrafficAdviceService>();
             services.AddTransient<IGeocodeService, GoogleMapsGeocodeService>();
             services.AddTransient<IDistanceToDurationService, GoogleMapsDistanceToDurationService>();
-            services.AddTransient<IDarkSkyService, HourlyAndMinutelyDarkSkyService>();
+            services.AddSingleton<IDarkSkyService, HourlyAndMinutelyDarkSkyService>();
 
             // Configure swagger
             services.AddOpenApiDocument(c =>

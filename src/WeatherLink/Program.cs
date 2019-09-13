@@ -33,7 +33,7 @@ namespace WeatherLink
                     var foundPort = int.TryParse(Environment.GetEnvironmentVariable("PORT"), out var port);
                     if (foundPort)
                     {
-                        webBuilder.UseUrls($"http://*:{port}");
+                        webBuilder.UseUrls($"http://*:{port}"); //DevSkim: ignore DS137138
                     }
                 });
     }
