@@ -1,5 +1,6 @@
 #region
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DarkSky.Models;
@@ -14,11 +15,11 @@ namespace WeatherLink.Services
     /// <summary>
     ///     A service to get a Dark Sky forecast for a latitude and longitude.
     /// </summary>
-    public class HourlyAndMinutelyDarkSkyService : IDarkSkyService
+    public class HourlyAndMinutelyDarkSkyService : IDarkSkyService, IDisposable
     {
-        private readonly DarkSkyService.OptionalParameters darkSkyParameters = new DarkSkyService.OptionalParameters
+        private readonly OptionalParameters darkSkyParameters = new OptionalParameters
         {
-            DataBlocksToExclude = new List<ExclusionBlock> {ExclusionBlock.Daily, ExclusionBlock.Alerts}
+            DataBlocksToExclude = new List<ExclusionBlocks> {ExclusionBlocks.Daily, ExclusionBlocks.Alerts}
         };
 
         private readonly DarkSkyService darkSkyService;
@@ -40,5 +41,37 @@ namespace WeatherLink.Services
         /// <returns>A DarkSkyResponse with the API headers and data.</returns>
         public async Task<DarkSkyResponse> GetForecast(double latitude, double longitude) =>
             await darkSkyService.GetForecast(latitude, longitude, darkSkyParameters);
+
+        #region IDisposable Support
+
+        private bool disposedValue; // To detect redundant calls
+
+        /// <summary>
+        ///     Dispose of resources used by the class.
+        /// </summary>
+        /// <param name="disposing">If the class is disposing managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    darkSkyService.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        /// <summary>
+        ///     Public access to start disposing of the class instance.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
     }
 }
