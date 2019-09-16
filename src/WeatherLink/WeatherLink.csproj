@@ -24,7 +24,7 @@
     <PackageReference Include="Humanizer.Core" Version="2.7.2" />
     <PackageReference Include="DarkSkyCore" Version="6.0.0" />
     <PackageReference Include="NSwag.AspNetCore" Version="13.0.6" />
-    <PackageReference Include="System.Text.Json" Version="4.6.0-preview9.19421.4" />
+    <PackageReference Include="System.Text.Json" Version="4.6.0-rc1.19456.4" />
     </ItemGroup>
 
 </Project>
