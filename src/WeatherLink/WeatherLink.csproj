@@ -21,7 +21,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.0.0" />
-    <PackageReference Include="Humanizer.Core" Version="2.7.2" />
+    <PackageReference Include="Humanizer.Core" Version="2.7.9" />
     <PackageReference Include="DarkSkyCore" Version="6.0.0" />
     <PackageReference Include="NSwag.AspNetCore" Version="13.1.1" />
     <PackageReference Include="System.Text.Json" Version="4.6.0" />
