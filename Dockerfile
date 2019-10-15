@@ -22,7 +22,7 @@ FROM build as publish
 WORKDIR /src/WeatherLink
 RUN dotnet publish -c Release -o app
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.0 AS runtime
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS runtime
 WORKDIR /app
 COPY --from=publish /src/WeatherLink/app ./
 ENTRYPOINT ["dotnet", "WeatherLink.dll"]
