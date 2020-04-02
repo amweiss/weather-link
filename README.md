@@ -1,3 +1,5 @@
+# ARCHIVED: [Apple has purchased Dark Sky and is shutting down the API, so I'm no longer supporting this.](https://blog.darksky.net/dark-sky-has-a-new-home/)
+
 # Weather Link
 
 ASP.NET Core web services for weather based information.
